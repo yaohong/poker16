@@ -2,3 +2,6 @@
 *.sln
 *.userprefs
 ProjectSettings/
+Library/
+Temp/
+obj/

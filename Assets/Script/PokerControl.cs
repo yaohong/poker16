@@ -26,8 +26,7 @@ class PokerControl: MonoBehaviour
     void Start()
     {
         unselectedPosition = this.transform.localPosition;
-		selectedPosition = unselectedPosition;
-		selectedPosition.y = selectedPosition.y + 10;
+		selectedPosition = selectCardObj.transform.localPosition;
     }
 
     public void SwitchSelectState()
@@ -40,7 +39,7 @@ class PokerControl: MonoBehaviour
     {
         if (selected)
         {
-			transform.localPosition = selectedPosition;
+			transform.localPosition = new Vector3 (unselectedPosition.x, selectedPosition.y, unselectedPosition.z);
         }
         else
         {
