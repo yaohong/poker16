@@ -32,7 +32,3 @@ public struct PlayerCard
 	public ushort value;
 }
 
-public class PlayerCards
-{
-	public List<PlayerCard> cards = new List<PlayerCard>();
-}

@@ -26,7 +26,7 @@ public class LoginLogic : MonoBehaviour {
 	public void OnLoginSuccess()
 	{
 		Debug.Log ("AAAA");
-		UILib.SwitchProcedurePanel ("DESKTOP");
+		UILib.SwitchProcedurePanel ("GAME");
 
 //		MSGBOXCALLBACK okcb = delegate() 
 //		{

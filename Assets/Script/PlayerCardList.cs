@@ -23,37 +23,43 @@ public class PlayerCardList : MonoBehaviour
 
 	public List<PlayerCard> PickSelectCards()
 	{
-		List<PlayerCard> list = new List<PlayerCard> ();
+		List<PlayerCard> theCardlist = new List<PlayerCard> ();
+		List<PlayerCard> overCardlist = new List<PlayerCard> ();
 		for (int i = 0; i < allCardObjects.Count; ++i) 
 		{
 			PokerControl p = allCardObjects[i].GetComponent<PokerControl> ();
-			if (p.isSelected) 
+			if (p.isSelected) {
+				theCardlist.Add (p.GetCard ());
+			}
+			else
 			{
-				list.Add (p.GetCard ());
+				overCardlist.Add (p.GetCard());
 			}
 		}
-		return list;
+
+		ShowCardList (overCardlist);
+		return theCardlist;
 	}
 
-	public void ShowCardList(PlayerCards playcards)
+	public void ShowCardList(List<PlayerCard> playcards)
 	{
 		ClearOldCard ();
 
 		Vector3 pos = Vector3.zero;
-		for (int i = 0; i < playcards.cards.Count; ++i) 
+		for (int i = 0; i < playcards.Count; ++i) 
 		{
 			GameObject childCard = GameObject.Instantiate (cardTemplate);
 			childCard.transform.parent = gameObject.transform;
-			allCardObjects.Add (childCard);
-
-			PokerControl p = childCard.GetComponent<PokerControl> ();
-			p.SetCard (playcards.cards [i]);
-			p.SetDepth (i);
-
 			childCard.transform.localPosition = pos;
 			childCard.transform.localScale = Vector3.one;
 
-			pos.x = pos.x + 20;
+			allCardObjects.Add (childCard);
+
+			PokerControl p = childCard.GetComponent<PokerControl> ();
+			p.SetCard (playcards [i]);
+			p.SetDepth (i);
+
+			pos.x = pos.x + 25;
 		}
 	}
 }
