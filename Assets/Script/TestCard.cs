@@ -33,4 +33,10 @@ public class TestCard : MonoBehaviour {
 
 		pcl.ShowCardList (pc);
 	}
+
+
+	public void TheCard()
+	{
+		List<PlayerCard> card = pcl.PickSelectCards ();
+	}
 }
