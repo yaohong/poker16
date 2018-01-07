@@ -26,23 +26,23 @@ public class LoginLogic : MonoBehaviour {
 	public void OnLoginSuccess()
 	{
 		Debug.Log ("AAAA");
-		//UILib.SwitchProcedurePanel ("DESKTOP");
+		UILib.SwitchProcedurePanel ("DESKTOP");
 
-		MSGBOXCALLBACK okcb = delegate() 
-		{
-			Debug.LogError("ok");
-		};
-
-		MSGBOXCALLBACK cancelcb = delegate() 
-		{
-			Debug.LogError("cancel");
-		};
-
-		Eventer.Fire("ShowMessageBox", new object[]　
-		{
-				"okok", 
-				okcb,
-				cancelcb,
-		} );
+//		MSGBOXCALLBACK okcb = delegate() 
+//		{
+//			Debug.LogError("ok");
+//		};
+//
+//		MSGBOXCALLBACK cancelcb = delegate() 
+//		{
+//			Debug.LogError("cancel");
+//		};
+//
+//		Eventer.Fire("ShowMessageBox", new object[]　
+//		{
+//				"哈哈哈", 
+//				okcb,
+//				cancelcb,
+//		} );
 	}
 }

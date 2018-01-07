@@ -27,7 +27,6 @@ public class MessageBoxManager : MonoBehaviourX
 				newDialog.transform.parent = this.gameObject.transform;
 				newDialog.transform.localScale = Vector3.one;
 				newDialog.transform.localPosition = Vector3.zero;
-				
 				GameObject MessageObj = newDialog.FindChildByName("Message");
 				MessageObj.GetComponent<UILabel>().text = args[0].ToString();
 
