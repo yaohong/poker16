@@ -1,320 +1,237 @@
-//using System;
-//using System.Collections;
-//using System.Collections.Generic;
-//using System.Net;
-//using UnityEngine;
-//
-//public class TcpManager : MonoBehaviourX
-//{
-//    public static int SEND_BUFFSIZE = 8192;
-//    public static int RECEIVE_BUFFSIZE = 8192;
-//    public static int TIMEOUT = 8000;
-//    public static int CONNECT_RETRY_TIMES = 5000;
-//    public static int CONNECT_INTERVAL_MILLSEC = 1000;
-//
-//    public static int INCOMING_PROTO_PROCESS_PRE_SECOND = 2000;
-//    public static float RECONNECT_TIMEOUT = 5f;
-//    public static int AUTO_RECONNECT_TIMES = 2;
-//
-//    public static float REQUEST_TIMEOUT = 11f;
-//    public static int REQUEST_MINTIMES = 30;
-//
-//    public class TimeoutCfg
-//    {
-//        public float tickPoint;
-//        public int times;
-//        public bool isOpen;
-//        public short routing;
-//        public uint cmdId;
-//
-//        public TimeoutCfg(float _tickPoint = 0f, int _times = 0, bool _isOpen = true)
-//        {
-//            tickPoint = _tickPoint;
-//            times = _times;
-//            isOpen = _isOpen;
-//        }
-//    }
-//
-//    protected TcpSocketBase tcpSocket;
-//
-//	protected Dictionary<int, INetUnpackedCallBack> sceneUnpackedCallBackMap = new Dictionary<int, INetUnpackedCallBack>();
-//
-//    protected string accountId = "";
-//    protected long worldToken = 0;
-//    protected TimeoutCfg timeoutCfg = new TimeoutCfg(0f, 0, false);
-//
-//    public string AccountId
-//    {
-//        set { accountId = value; }
-//        get { return accountId; }
-//    }
-//
-//    public long WorldToken
-//    {
-//        set { worldToken = value; }
-//        get { return worldToken; }
-//    }
-//
-//    protected bool isReconnectRequest = false;
-//
-//    public bool IsReconnectRequest
-//    {
-//        get { return isReconnectRequest; }
-//        set { isReconnectRequest = value; }
-//    }
-//
-//    static TcpManager ins = null;
-//
-//    public static TcpManager Ins
-//    {
-//        get
-//        {
-//            return ins;
-//        }
-//    }
-//
-//    private void Awake()
-//    {
-//        if (ins != null)
-//        {
-//            Debug.LogError("TcpManager Recreate!!");
-//        }
-//
-//        ins = this;
-//    }
-//
-//    void Start()
-//    {
-//        //SceneCmdLogin.RegisterLoginScene();
-//
-//        scope.Listen("NetworkPlayerReconnect", (args) =>
-//        {
-//            if (tcpSocket != null)
-//            {
-//                tcpSocket.ForceNextReconnect();
-//                tcpSocket.State = SocketTaskState.STS_DISCONNECT;
-//            }
-//        });
-//
-//        scope.Listen("GameShutdown", (args) =>
-//        {
-//            accountId = "";
-//            worldToken = 0;
-//            isReconnectRequest = false;
-//            timeoutCfg = new TimeoutCfg(0f, 0, false);
-//            if (tcpSocket != null)
-//            {
-//                tcpSocket.ResetReconnectTimes();
-//                tcpSocket.NeedAutoReconnect = false;
-//            }
-//        });
-//
-//        scope.Listen("NetworkShutDownBeforeGameReload", args =>
-//        {
-//            string reason = (string) args[0];
-//            // DisconnectAndRelogin(reason);
-//        });
-//    }
-//
-//    void Update()
-//    {
-//        if (tcpSocket != null)
-//        {
-//            tcpSocket.RecvPackets();
-//
-//            float frameProcessPacketsLimit = INCOMING_PROTO_PROCESS_PRE_SECOND * Time.deltaTime;
-//            tcpSocket.AsyncUnpackIncomingPackets(Math.Max((int)frameProcessPacketsLimit, 100));
-//			if (tcpSocket.State != SocketTaskState.STS_WORKING)
-//            {
-//                return;
-//            }
-//
-//            tcpSocket.SendDelayedData();
-//
-//            if (timeoutCfg.isOpen)
-//            {
-//                float now = Time.unscaledTime;
-//                if (now >= timeoutCfg.tickPoint && timeoutCfg.times >= REQUEST_MINTIMES)
-//                {
-//                    timeoutCfg.isOpen = false;
-//                    tcpSocket.OnDisconnect("");
-//                    if (IsReconnectRequest || !tcpSocket.NeedAutoReconnect)
-//                    {
-//                        tcpSocket.DisconnectAndRelogin(rt);
-//                    }
-//                }
-//                timeoutCfg.times++;
-//            }
-//        }
-//    }
-//
-//    public void IncomingProtosCallback()
-//    {
-//        //从GameManager延迟调用
-//        if (tcpSocket != null)
-//        {
-//            UnityEngine.Profiling.Profiler.BeginSample("Proto Callbacks");
-//            tcpSocket.IncomingProtosCallback();
-//            UnityEngine.Profiling.Profiler.EndSample();
-//        }
-//    }
-//
-//    new void OnDestroy()
-//    {
-//        if (tcpSocket != null)
-//        {
-//            tcpSocket.CloseSocket();
-//        }
-//        ins = null;
-//    }
-//
-//    public void ConnectByIpPort(string ip, int port)
-//    {
-//        EndPoint ServerAddr = new IPEndPoint(IPAddress.Parse(ip), port);
-//
-//        if (tcpSocket != null)
-//        {
-//            tcpSocket.CloseSocket();
-//        }
-//
-//        tcpSocket = new TcpSocketBase();
-//        tcpSocket.ReconnectInterval = RECONNECT_TIMEOUT;
-//        tcpSocket.Connect(ServerAddr);
-//
-//        string svrAddrString = string.Format("{0}:{1}", ip, port);
-//        Log.Logic("TCP连接 [{0}]", svrAddrString);
-//        Eventer.Fire("BUGREPORT_CONNECT", new object[] { svrAddrString });
-//    }
-//
-//    protected bool removeTimeoutCfg()
-//    {
-//        if (timeoutCfg.isOpen)
-//        {
-//            timeoutCfg.isOpen = false;
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//
-//    public INetUnpackedCallBack ScenePacketUnpack(int cmd, byte[] body)
-//    {
-//        INetUnpackedCallBack unpackedCallbackFunc;
-//        if (sceneUnpackedCallBackMap.TryGetValue(cmd, out unpackedCallbackFunc))
-//        {
-//            return unpackedCallbackFunc.Unpack(body);
-//        }
-//        else
-//        {
-//#if UNITY_EDITOR
-//            Log.Warning("Callback NOT Registered for scene proto [{0}]", cmd.ToString());
-//#endif
-//            return null;
-//        }
-//    }
-//
-//    public void RegisterUnpackedCallBack(int cmd, INetUnpackedCallBack callback)
-//    {
-//        sceneUnpackedCallBackMap.Add(cmd, callback);
-//    }
-//
-//
-//    public void ClearCallBack()
-//    {
-//        sceneUnpackedCallBackMap.Clear();
-//    }
-//
-//    protected void updateSender(short routing, uint cmdId)
-//    {
-//        if (timeoutCfg.isOpen)
-//        {
-//            return;
-//        }
-//
-//        timeoutCfg.isOpen = true;
-//        timeoutCfg.tickPoint = Time.unscaledTime + REQUEST_TIMEOUT;
-//        timeoutCfg.times = 0;
-//        timeoutCfg.routing = routing;
-//        timeoutCfg.cmdId = cmdId;
-//    }
-//
-//    private bool _SendData(uint cmd, byte[] data, short routing)
-//    {
-//        if (tcpSocket == null)
-//        {
-//            return false;
-//        }
-//
-//        int rt = tcpSocket.SendData(cmd, data, routing);
-//        if (rt == 0)
-//        {
-//            return true;
-//        }
-//
-//        if (rt > 0)
-//        {
-//            Log.Error("SendTcpDataFail, cmdId={0}, result={1}", cmd.ToString(), rt);
-//        }
-//
-//        return false;
-//    }
-//
-//
-//    public bool SendScene(int cmd, byte[] data)
-//    {
-//        bool ret = _SendData((uint)cmd, data, Const.SCENE_ROUTING);
-//        if (ret) updateSender(Const.SCENE_ROUTING, (uint)cmd);
-//        return ret;
-//    }
-//
-//    public void ClearAllTimeoutMap()
-//    {
-//        timeoutCfg.isOpen = false;
-//    }
-//
-//    public void SetReconnected()
-//    {
-//        if (tcpSocket != null)
-//        {
-//            tcpSocket.SetReconnected();
-//        }
-//    }
-//
-//    public void DelayLaterProtoCallback()
-//    {
-//        if (tcpSocket != null)
-//        {
-//            tcpSocket.DelayLaterProtoCallback();
-//        }
-//    }
-//
-//    public bool IsWorkState()
-//    {
-//        return tcpSocket.IsWorkState();
-//    }
-//
-//    public void Disconnect(string rt)
-//    {
-//        tcpSocket.OnDisconnect(rt);
-//    }
-//
-//    public void DisconnectAndRelogin(string rt)
-//    {
-//        tcpSocket.DisconnectAndRelogin(rt);
-//    }
-//
-//    public bool NeedPing
-//    {
-//        get { return tcpSocket.State == SocketTaskState.STS_WORKING; }
-//    }
-//
-//    public void DoEnterScene()
-//    {
-//        IsReconnectRequest = false;
-//        if (tcpSocket != null)
-//        {
-//            tcpSocket.ResetReconnectTimes();
-//            tcpSocket.NeedAutoReconnect = true;
-//        }
-//    }
-//}
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net;
+using UnityEngine;
+
+
+public enum SocketTaskState
+{
+    STS_IDLE,
+    // 闲置状态
+    STS_CONNECTING,
+    //连接成功
+    STS_WORKING,
+    // 工作状态
+    STS_DISCONNECT,
+    // 断线状态
+}
+
+public class TcpManager : MonoBehaviourX
+{
+
+    public static float CONNECT_TIMEOUT = 5f;       //链接的最长时间
+    public static float RECEIVE_TIMEOUT = 30f;      //30秒没收到数据
+
+    protected TcpSocket tcpSocket = null;
+    protected EndPoint serverAddr;
+    protected SocketTaskState socketTaskState = SocketTaskState.STS_IDLE;
+
+    protected bool reconnectMask = false;           //重连标志
+    protected int reconnectCount = 0;               //重连的次数
+    protected int autoReconnectMaxCount = 5;        //自动重连的最大次数
+
+    protected float lastReconnectTime = 0f;         //开始连接的时间
+    protected float lastReceivePacketTime = 0f;     //最后一次收到完整包的时间
+    static TcpManager ins = null;
+
+    public static TcpManager Ins
+    {
+        get
+        {
+            return ins;
+        }
+    }
+
+    private void Awake()
+    {
+        if (ins != null)
+        {
+            Debug.LogError("TcpManager Recreate!!");
+        }
+
+        ins = this;
+    }
+
+    void Start()
+    {
+
+    }
+
+    void Update()
+    {
+        switch (socketTaskState)
+        {
+            case SocketTaskState.STS_IDLE:
+                //什么都不做
+                break;
+            case SocketTaskState.STS_CONNECTING:
+                //套接字正在连接中
+                //检测是否链接成功
+                if (tcpSocket.ConncetSuccess())
+                {
+                    //链接成功
+                    ChangeSocketTaskState(SocketTaskState.STS_WORKING);
+                    lastReceivePacketTime = Time.time;
+                    //判断是第一次链接成功还是重连成功
+                    Log.Logic("Connect success, startConnectTime={0}, curTime={1}", lastReconnectTime, lastReceivePacketTime);
+                    Eventer.Fire("ConnectSuccess", new object[] { reconnectMask });
+
+                    ResetReconnectMask(false);
+                }
+                else
+                {
+                    float now = Time.time;
+                    if (now > lastReconnectTime + CONNECT_TIMEOUT)
+                    {
+                        //链接超时了
+                        Log.Logic("Connect timeout, startConnectTime={0}, curTime={1}", lastReconnectTime, now);
+                        DestroyCurrentSocket();
+                        ChangeSocketTaskState(SocketTaskState.STS_DISCONNECT);
+                    }
+                }
+                break;
+            case SocketTaskState.STS_DISCONNECT:
+                if (!reconnectMask || reconnectCount >= autoReconnectMaxCount)
+                {
+                    Log.Logic("reconnectMask={0}, reconnectCount={1}, connectFailed", reconnectMask, reconnectCount);
+                    //不支持重连，或许重连达到最大次数
+                    Eventer.Fire("ConnectFailed", new object[] { reconnectMask });
+                    //进入空闲状态
+                    ChangeSocketTaskState(SocketTaskState.STS_IDLE);
+                }
+                else
+                {
+                    //进行重连
+                    float now = Time.time;
+                    tcpSocket = new TcpSocket();
+                    if (tcpSocket.Connect(serverAddr))
+                    {
+                        reconnectCount++;
+                        Log.Logic("start reconnect, reconnectMask={0}, reconnectCount={1}, time={2}", reconnectMask, reconnectCount, now);
+                        ChangeSocketTaskState(SocketTaskState.STS_CONNECTING);
+                        lastReconnectTime = Time.time;
+                    }
+                    else
+                    {
+                        Log.Logic("reconnect failed, reconnectMask={0}, reconnectCount={1}, time={2}", reconnectMask, reconnectCount, now);
+                        //直接连接失败了。不用检查重试了
+                        DestroyCurrentSocket();
+                        Eventer.Fire("ConnectFailed", new object[] { reconnectMask });
+                        ChangeSocketTaskState(SocketTaskState.STS_IDLE);
+                    }
+                }
+                break;
+            case SocketTaskState.STS_WORKING:
+                //接收数据
+                Queue<IncomingPacket> msgQueue = new Queue<IncomingPacket>();
+                if (!tcpSocket.DoMessageRecv(ref msgQueue))
+                {
+                    //读取数据失败了
+                    Log.Logic("tcpSocket.DoMessageRecv failed");
+                    OnDisconnect();
+                }
+                else
+                {
+                    float now = Time.time;
+                    if (msgQueue.Count == 0)
+                    {
+                        if (now >= lastReceivePacketTime + RECEIVE_TIMEOUT)
+                        {
+                            Log.Logic("tcpSocket.DoMessageRecv timeout, lastReceivePacketTime={0} now={1}", lastReceivePacketTime, now);
+                            //接收数据超时,当作断开处理
+                            OnDisconnect();
+                        }
+                    }
+                    else
+                    {
+                        //有消息
+                        lastReceivePacketTime = now;
+                        Log.Logic("tcpSocket.DoMessageRecv success, update lastReceivePacketTime={0}", lastReceivePacketTime);
+                    }
+                    
+                }
+                break;
+        }
+    }
+
+
+    void OnDestroy()
+    {
+        DestroyCurrentSocket();
+        ins = null;
+    }
+
+    public bool ConnectByIpPort(string ip, int port)
+    {
+        DestroyCurrentSocket();
+        serverAddr = new IPEndPoint(IPAddress.Parse(ip), port);
+        float time = Time.time; ;
+        string svrAddrString = string.Format("{0}:{1} {2}", ip, port, time);
+        Log.Logic("TCP连接 [{0}]", svrAddrString);
+ 
+        tcpSocket = new TcpSocket();
+        bool connectState = tcpSocket.Connect(serverAddr);
+        if (!connectState)
+        {
+            //链接失败了
+            DestroyCurrentSocket();
+            return false;
+        }
+
+        ResetReconnectMask(false);
+        ChangeSocketTaskState(SocketTaskState.STS_CONNECTING);
+        lastReconnectTime = time;
+        return true;
+    }
+
+    private void ChangeSocketTaskState(SocketTaskState newTaskState)
+    {
+        Log.Logic("SocketTaskState {0}=>{1}", socketTaskState, newTaskState);
+        socketTaskState = newTaskState;
+    }
+
+    private void DestroyCurrentSocket()
+    {
+        if (tcpSocket != null)
+        {
+            tcpSocket.CloseSocket();
+            tcpSocket = null;
+        }
+    }
+
+    public void SendData(int cmd, byte[] data)
+    {
+        if (tcpSocket != null)
+        {
+            if (socketTaskState != SocketTaskState.STS_WORKING)
+            {
+                return;
+            }
+
+            if (!tcpSocket.SendData(cmd, data))
+            {
+                //发送数据失败了，销毁当前套接字
+                OnDisconnect();
+            }
+        }
+
+    }
+
+    private void OnDisconnect()
+    {
+        DestroyCurrentSocket();
+        ChangeSocketTaskState(SocketTaskState.STS_DISCONNECT);
+        //设置重连状态
+        ResetReconnectMask(true);
+        Eventer.Fire("Disconnect");
+    }
+
+
+    private void ResetReconnectMask(bool mask)
+    {
+        reconnectMask = mask;
+        reconnectCount = 0;
+    }
+
+}

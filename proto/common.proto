@@ -1,0 +1,160 @@
+// Client <-> WorldServer
+
+package qp_server;
+
+message qp_packet {
+    required int32 cmd = 1;
+    optional bytes serialized = 2;
+}
+
+
+enum ws_cmd {
+    CMD_QP_LOGIN_REQ = 1001; // 登录请求 (qp_login_req)
+    CMD_QP_LOGIN_RSP = 1002; // 登录回复 (qp_login_rsp)
+
+    CMD_QP_CREATE_ROOM_REQ = 1003;  //qp_create_room_req
+    CMD_QP_CREATE_ROOM_RSP = 1004;  //qp_create_room_rsp
+
+    CMD_QP_JOIN_ROOM_REQ = 1005;        //qp_join_room_req
+    CMD_QP_JOIN_ROOM_RSP = 1006;        //qp_join_room_rsp
+    CMD_QP_JOIN_ROOM_PUSH = 1007;       //qp_join_room_push
+
+    CMD_QP_SITDOWN_REQ = 1008;          // qp_sitdown_req
+    CMD_QP_SITDOWN_RSP = 1009;          // qp_sitdown_rsp
+    CMD_QP_SITDOWN_PUSH = 1010;         // qp_sitdown_push
+
+    CMD_QP_STANDUP_REQ = 1011;          // qp_standup_req
+    CMD_QP_STANDUP_RSP = 1012;          // qp_standup_rsp
+    CMD_QP_STANDUP_PUSH = 1013;         // qp_standup_push
+
+    CMD_QP_EXIT_ROOM_REQ = 1014;        // qp_exit_room_req
+    CMD_QP_EXIT_ROOM_RSP = 1015;        // qp_exit_room_rsp
+    CMD_QP_EXIT_ROOM_PUSH = 1016;       // qp_exit_room_push
+
+    CMD_QP_GAME_DATA = 2001;        // qp_game_data
+
+
+    CMD_QP_PING_REQ = 5001;         // qp_ping_req
+    CMD_QP_PING_RSP = 5002;         //qp_ping_rsp
+}
+
+
+
+message qp_login_req {
+    required string account = 1;
+    required string pwd = 2;
+}
+
+message pb_user_public_data {
+    required int32  user_id = 1;
+    required string avatar_url = 2;
+    required string nick_name = 3;
+}
+
+message pb_user_private_data {
+    required int32 room_card_count = 1;
+}
+
+message qp_login_rsp {
+    required int32 state = 1;
+    optional pb_user_public_data public_data = 2;
+    optional pb_user_private_data private_data = 3;
+}
+
+message pb_room_cfg {
+    required int32 double_down_score = 1;
+    required bool is_laizi_playmethod = 2;
+    required bool is_ob = 3;
+    required bool is_random = 4;
+    required bool is_not_voice = 5;
+    required bool is_safe_mode = 6;
+}
+
+
+message qp_create_room_req {
+    required pb_room_cfg cfg = 1;
+}
+
+
+message qp_create_room_rsp {
+    required int32 state = 1;
+    optional int32 room_id = 2;
+    optional pb_room_cfg cfg = 3;
+}
+
+
+message qp_join_room_req {
+    required int32 room_id = 1;
+}
+
+message pb_room_user {
+    required pb_user_public_data user_public_data = 1;
+    required int32 seat_number = 2;
+}
+
+
+message qp_join_room_rsp {
+    required int32 result = 1;
+    repeated pb_room_user room_users = 2;
+}
+
+
+message qp_join_room_push {
+    required pb_user_public_data public_data = 1;
+}
+
+
+message qp_sitdown_req {
+    required int32 seat_num = 1;
+}
+
+message qp_sitdown_rsp {
+    required int32 result = 1;
+}
+
+message qp_sitdown_push {
+    required int32 seat_num = 1;
+    required int32 user_id = 2;
+}
+
+message qp_standup_req {
+    optional int32 noop = 1;
+}
+
+message qp_standup_rsp {
+    required int32 state = 1;
+}
+
+message qp_standup_push {
+    required int32 seat_num = 1;
+}
+
+
+
+message qp_exit_room_req {
+    optional int32 noop = 1;
+}
+
+
+message qp_exit_room_rsp {
+    required int32 result = 1;
+}
+
+message qp_exit_room_push {
+    required int32 user_id = 1;
+}
+
+
+message qp_game_data {
+    required bytes game_data = 1;
+}
+
+
+message qp_ping_req {
+    optional int32 noop = 1;
+}
+
+
+message qp_ping_rsp {
+    optional int32 noop = 1;
+}
