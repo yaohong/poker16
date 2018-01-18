@@ -269,8 +269,8 @@ public class TcpSocket
         }
 
         //             1.包长度 
-        uint headSize = sizeof(int);
-        uint headIndex = 0;
+        int headSize = sizeof(int);
+        int headIndex = 0;
 
         byte[] buff = new byte[pbBuf.Length + headSize];
 

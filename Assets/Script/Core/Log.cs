@@ -69,12 +69,12 @@ public class Log
     public static void LogByte(byte[] buff, int len)
     {
         string str = "BUFF, len=" + len.ToString() + ", data=";
-        int logSize = Mathf.Min(len, 16);
+        int logSize = Mathf.Min(len, 64);
         for (int i = 0; i < logSize; ++i)
         {
             str += string.Format("{0},", buff[i]);
         }
-        //Debug.Log(str);
+        Debug.Log(str);
     }
 
     public static void TraceBack()

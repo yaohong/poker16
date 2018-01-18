@@ -25,15 +25,18 @@ public class TcpManager : MonoBehaviourX
 
     protected TcpSocket tcpSocket = null;
     protected EndPoint serverAddr;
-    protected SocketTaskState socketTaskState = SocketTaskState.STS_IDLE;
+    public SocketTaskState socketTaskState = SocketTaskState.STS_IDLE;
 
-    protected bool reconnectMask = false;           //重连标志
-    protected int reconnectCount = 0;               //重连的次数
+    public bool reconnectMask = false;           //重连标志
+    public int reconnectCount = 0;               //重连的次数
     protected int autoReconnectMaxCount = 5;        //自动重连的最大次数
 
-    protected float lastReconnectTime = 0f;         //开始连接的时间
-    protected float lastReceivePacketTime = 0f;     //最后一次收到完整包的时间
+    public float lastReconnectTime = 0f;         //开始连接的时间
+    public float lastReceivePacketTime = 0f;     //最后一次收到完整包的时间
+    public float curTime = 0f;                  //当前时间
     static TcpManager ins = null;
+
+    private Queue<IncomingPacket> msgQueue = new Queue<IncomingPacket>();
 
     public static TcpManager Ins
     {
@@ -60,6 +63,7 @@ public class TcpManager : MonoBehaviourX
 
     void Update()
     {
+        curTime = Time.time;
         switch (socketTaskState)
         {
             case SocketTaskState.STS_IDLE:
@@ -124,7 +128,7 @@ public class TcpManager : MonoBehaviourX
                 break;
             case SocketTaskState.STS_WORKING:
                 //接收数据
-                Queue<IncomingPacket> msgQueue = new Queue<IncomingPacket>();
+                
                 if (!tcpSocket.DoMessageRecv(ref msgQueue))
                 {
                     //读取数据失败了
@@ -148,6 +152,11 @@ public class TcpManager : MonoBehaviourX
                         //有消息
                         lastReceivePacketTime = now;
                         Log.Logic("tcpSocket.DoMessageRecv success, update lastReceivePacketTime={0}", lastReceivePacketTime);
+                        foreach (IncomingPacket packet in msgQueue)
+                        {
+                            Eventer.Fire("CompletePacket", new object[] { packet });
+                        }
+                        msgQueue.Clear();
                     }
                     
                 }
@@ -181,6 +190,7 @@ public class TcpManager : MonoBehaviourX
 
         ResetReconnectMask(false);
         ChangeSocketTaskState(SocketTaskState.STS_CONNECTING);
+        //Eventer.Fire("Connecting");
         lastReconnectTime = time;
         return true;
     }
@@ -197,6 +207,7 @@ public class TcpManager : MonoBehaviourX
         {
             tcpSocket.CloseSocket();
             tcpSocket = null;
+            msgQueue.Clear();
         }
     }
 
@@ -213,6 +224,10 @@ public class TcpManager : MonoBehaviourX
             {
                 //发送数据失败了，销毁当前套接字
                 OnDisconnect();
+            }
+            else
+            {
+                Log.Logic("sendData success");
             }
         }
 

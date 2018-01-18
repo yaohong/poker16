@@ -40,6 +40,7 @@ public class RoomViewControl : MonoBehaviour {
         RoomInfoControl infoControl = roomInfoPanel.GetComponent<RoomInfoControl>();
         infoControl.SetViewControl(this);
         infoControl.RoomId = roomPanelCount;
+        infoControl.RoomState = ERoomState.RS_Ready;
         allRoomPanelObjects.Add(roomInfoPanel);
     }
 
