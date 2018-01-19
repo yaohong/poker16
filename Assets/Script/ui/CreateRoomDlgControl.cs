@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CreateRoomMsgBoxControl : MonoBehaviour {
+public class CreateRoomDlgControl : MonoBehaviour {
 
     private HallControl hallControl;
 	// Use this for initialization

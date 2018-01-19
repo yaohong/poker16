@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HallControl : MonoBehaviour {
+public class HallControl : MonoBehaviour, IScene
+{
 
 
     //public UIScrollView roomInfoPanelContainer;
-    public GameObject createRoomMsgBoxTempalte;
-    public GameObject msgBoxParentObj;
+    public GameObject createRoomDlgTempalte;
+    public GameObject dlgParentObj;
+
+    public RoomViewControl roomViewControl;
 	// Use this for initialization
 	void Start () {
 		
@@ -37,6 +40,7 @@ public class HallControl : MonoBehaviour {
     public void BindClick()
     {
         Debug.LogError("BindClick");
+        Scheduling.Ins.ChangeScene(SceneType.ST_Login);
     }
 
     public void TaskClick()
@@ -51,18 +55,49 @@ public class HallControl : MonoBehaviour {
 
     public void CreateRoomClick()
     {
-        GameObject createRoomMsgBoxObj = GameObject.Instantiate(createRoomMsgBoxTempalte);
-        CreateRoomMsgBoxControl bc = createRoomMsgBoxObj.GetComponent<CreateRoomMsgBoxControl>();
+        GameObject createRoomDlgxObj = GameObject.Instantiate(createRoomDlgTempalte);
+        CreateRoomDlgControl bc = createRoomDlgxObj.GetComponent<CreateRoomDlgControl>();
         bc.SetHallControl(this);
 
-        createRoomMsgBoxObj.transform.parent = msgBoxParentObj.transform;
-        createRoomMsgBoxObj.transform.localScale = Vector3.one;
-        createRoomMsgBoxObj.transform.localPosition = Vector3.one;
+        createRoomDlgxObj.transform.parent = dlgParentObj.transform;
+        createRoomDlgxObj.transform.localScale = Vector3.one;
+        createRoomDlgxObj.transform.localPosition = Vector3.one;
 
     }
 
     public void CbCreateRoom(string roomName, int doubleDownScore, bool isAA, bool isLaiziPalyMethod, bool isOb, bool isRandom, bool isNotVoice, bool isSaftMode)
     {
         Debug.LogFormat("CreateRoomCallBack roomName[{0}]", roomName);
+    }
+
+    /// <summary>
+    /// ///////////////////////////////////////////
+    /// </summary>
+    public void OnConnectSuccess()
+    {
+
+    }
+    public void OnConnectFailed()
+    {
+
+    }
+    public void OnDisconnect()
+    {
+
+    }
+
+    public void OnCompletePacket(qp_server.qp_packet packet)
+    {
+
+    }
+
+    public void EnterScene()
+    {
+        gameObject.SetActive(true);
+    }
+    public void ExitScene()
+    {
+        roomViewControl.ClearAllRoomInfo();
+        gameObject.SetActive(false);
     }
 }

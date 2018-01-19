@@ -11,9 +11,9 @@ public enum SocketTaskState
     // 闲置状态
     STS_CONNECTING,
     //连接成功
-    STS_WORKING,
+    STS_WORKING
     // 工作状态
-    STS_DISCONNECT,
+    //STS_DISCONNECT,
     // 断线状态
 }
 
@@ -27,9 +27,9 @@ public class TcpManager : MonoBehaviourX
     protected EndPoint serverAddr;
     public SocketTaskState socketTaskState = SocketTaskState.STS_IDLE;
 
-    public bool reconnectMask = false;           //重连标志
-    public int reconnectCount = 0;               //重连的次数
-    protected int autoReconnectMaxCount = 5;        //自动重连的最大次数
+    //public bool reconnectMask = false;           //重连标志
+    //public int reconnectCount = 0;               //重连的次数
+    //protected int autoReconnectMaxCount = 5;        //自动重连的最大次数
 
     public float lastReconnectTime = 0f;         //开始连接的时间
     public float lastReceivePacketTime = 0f;     //最后一次收到完整包的时间
@@ -79,9 +79,9 @@ public class TcpManager : MonoBehaviourX
                     lastReceivePacketTime = Time.time;
                     //判断是第一次链接成功还是重连成功
                     Log.Logic("Connect success, startConnectTime={0}, curTime={1}", lastReconnectTime, lastReceivePacketTime);
-                    Eventer.Fire("ConnectSuccess", new object[] { reconnectMask });
+                    Eventer.Fire("ConnectSuccess", new object[] { });
 
-                    ResetReconnectMask(false);
+                    //ResetReconnectMask(false);
                 }
                 else
                 {
@@ -91,41 +91,43 @@ public class TcpManager : MonoBehaviourX
                         //链接超时了
                         Log.Logic("Connect timeout, startConnectTime={0}, curTime={1}", lastReconnectTime, now);
                         DestroyCurrentSocket();
-                        ChangeSocketTaskState(SocketTaskState.STS_DISCONNECT);
-                    }
-                }
-                break;
-            case SocketTaskState.STS_DISCONNECT:
-                if (!reconnectMask || reconnectCount >= autoReconnectMaxCount)
-                {
-                    Log.Logic("reconnectMask={0}, reconnectCount={1}, connectFailed", reconnectMask, reconnectCount);
-                    //不支持重连，或许重连达到最大次数
-                    Eventer.Fire("ConnectFailed", new object[] { reconnectMask });
-                    //进入空闲状态
-                    ChangeSocketTaskState(SocketTaskState.STS_IDLE);
-                }
-                else
-                {
-                    //进行重连
-                    float now = Time.time;
-                    tcpSocket = new TcpSocket();
-                    if (tcpSocket.Connect(serverAddr))
-                    {
-                        reconnectCount++;
-                        Log.Logic("start reconnect, reconnectMask={0}, reconnectCount={1}, time={2}", reconnectMask, reconnectCount, now);
-                        ChangeSocketTaskState(SocketTaskState.STS_CONNECTING);
-                        lastReconnectTime = Time.time;
-                    }
-                    else
-                    {
-                        Log.Logic("reconnect failed, reconnectMask={0}, reconnectCount={1}, time={2}", reconnectMask, reconnectCount, now);
-                        //直接连接失败了。不用检查重试了
-                        DestroyCurrentSocket();
-                        Eventer.Fire("ConnectFailed", new object[] { reconnectMask });
+                        //ChangeSocketTaskState(SocketTaskState.STS_DISCONNECT);
                         ChangeSocketTaskState(SocketTaskState.STS_IDLE);
+                        Eventer.Fire("ConnectFailed", new object[] {});
                     }
                 }
                 break;
+            //case SocketTaskState.STS_DISCONNECT:
+            //    if (!reconnectMask || reconnectCount >= autoReconnectMaxCount)
+            //    {
+            //        Log.Logic("reconnectMask={0}, reconnectCount={1}, connectFailed", reconnectMask, reconnectCount);
+            //        //不支持重连，或许重连达到最大次数
+            //        Eventer.Fire("ConnectFailed", new object[] { reconnectMask });
+            //        //进入空闲状态
+            //        ChangeSocketTaskState(SocketTaskState.STS_IDLE);
+            //    }
+            //    else
+            //    {
+            //        //进行重连
+            //        float now = Time.time;
+            //        tcpSocket = new TcpSocket();
+            //        if (tcpSocket.Connect(serverAddr))
+            //        {
+            //            reconnectCount++;
+            //            Log.Logic("start reconnect, reconnectMask={0}, reconnectCount={1}, time={2}", reconnectMask, reconnectCount, now);
+            //            ChangeSocketTaskState(SocketTaskState.STS_CONNECTING);
+            //            lastReconnectTime = Time.time;
+            //        }
+            //        else
+            //        {
+            //            Log.Logic("reconnect failed, reconnectMask={0}, reconnectCount={1}, time={2}", reconnectMask, reconnectCount, now);
+            //            //直接连接失败了。不用检查重试了
+            //            DestroyCurrentSocket();
+            //            Eventer.Fire("ConnectFailed", new object[] { reconnectMask });
+            //            ChangeSocketTaskState(SocketTaskState.STS_IDLE);
+            //        }
+            //    }
+            //    break;
             case SocketTaskState.STS_WORKING:
                 //接收数据
                 
@@ -188,7 +190,6 @@ public class TcpManager : MonoBehaviourX
             return false;
         }
 
-        ResetReconnectMask(false);
         ChangeSocketTaskState(SocketTaskState.STS_CONNECTING);
         //Eventer.Fire("Connecting");
         lastReconnectTime = time;
@@ -236,17 +237,9 @@ public class TcpManager : MonoBehaviourX
     private void OnDisconnect()
     {
         DestroyCurrentSocket();
-        ChangeSocketTaskState(SocketTaskState.STS_DISCONNECT);
+        ChangeSocketTaskState(SocketTaskState.STS_IDLE);
         //设置重连状态
-        ResetReconnectMask(true);
         Eventer.Fire("Disconnect");
-    }
-
-
-    private void ResetReconnectMask(bool mask)
-    {
-        reconnectMask = mask;
-        reconnectCount = 0;
     }
 
 }

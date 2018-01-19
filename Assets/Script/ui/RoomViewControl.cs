@@ -6,7 +6,6 @@ public class RoomViewControl : MonoBehaviour {
 
 	// Use this for initialization
     public GameObject roomInfoPanelInitLocationObj;
-
     public GameObject roomInfoPanelTempalte;
     public GameObject roomScrollViewObj;
 
@@ -42,6 +41,15 @@ public class RoomViewControl : MonoBehaviour {
         infoControl.RoomId = roomPanelCount;
         infoControl.RoomState = ERoomState.RS_Ready;
         allRoomPanelObjects.Add(roomInfoPanel);
+    }
+
+    public void ClearAllRoomInfo()
+    {
+        foreach(var roomInfo in allRoomPanelObjects)
+        {
+            GameObject.DestroyObject(roomInfo);
+        }
+        allRoomPanelObjects.Clear();
     }
 
 
