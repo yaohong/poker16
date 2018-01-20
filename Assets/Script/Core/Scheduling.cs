@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum SceneType
 {
+    ST_None,
     ST_Login,                  //登陆场景
     ST_Hall,                   //大厅
     ST_Game                    //游戏界面
@@ -28,6 +29,7 @@ public class Scheduling : MonoBehaviourX
     public GameObject hallControl;
     public GameObject gameControl;
 
+    public SceneType currentSceneType = SceneType.ST_None;
     static Scheduling ins = null;
 
     private IScene currentScene = null;
@@ -74,6 +76,7 @@ public class Scheduling : MonoBehaviourX
         }
 
         currentScene = sceneMap[type];
+        currentSceneType = type;
         currentScene.EnterScene();
     }
 

@@ -41,6 +41,11 @@ public class AccountLoginDlgControl : MonoBehaviour {
         loginControl.AccountLogin(accInput.value, pwdInput.value);
     }
 
+    public void SetState(string state)
+    {
+        stateLable.text = state;
+    }
+
     public void ExitBtnClick()
     {
         loginControl.ExitAccountLoginDlg();

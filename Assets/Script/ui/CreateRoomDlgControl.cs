@@ -4,8 +4,24 @@ using UnityEngine;
 
 public class CreateRoomDlgControl : MonoBehaviour {
 
+    public UIInput roomNameInput;
+    public UIToggle cb100;
+    public UIToggle cb200;
+    public UIToggle cblaizi;
+    public UIToggle cbob;
+    public UIToggle cbrandom;
+    public UIToggle cbnotvoice;
+    public UIToggle cbsaft;
+
     private HallControl hallControl;
 	// Use this for initialization
+
+    void Start()
+    {
+        cb200.value = true;
+        cbnotvoice.value = false;
+        cbsaft.value = false;
+    }
 
     public void SetHallControl(HallControl hc)
     {
@@ -15,20 +31,35 @@ public class CreateRoomDlgControl : MonoBehaviour {
     //玩家AA
     public void AABtnClick()
     {
-        hallControl.CbCreateRoom("aaRoom", 200, true, true, true, true, true, true);
-        GameObject.Destroy(this.gameObject);
+        CreateRoom(true);
     }
 
     //包场
     public void SelfBtnClick()
     {
-        hallControl.CbCreateRoom("selfRoom", 200, false, true, true, true, true, true);
-        GameObject.Destroy(this.gameObject);
+        CreateRoom(false);
+    }
+
+    public void CreateRoom(bool openType)
+    {
+        string roomName = roomNameInput.value;
+        int doubleScore = 100;
+        if (cb100.value)
+        {
+            doubleScore = 100;
+        }
+
+        if (cb200.value)
+        {
+            doubleScore = 200;
+        }
+
+        hallControl.CreateRoomDlg_CreateBtnClick(roomName, doubleScore, openType, cblaizi.value, cbob.value, cbrandom.value, cbnotvoice.value, cbsaft.value);
     }
 
     public void ExitClick()
     {
-        GameObject.Destroy(this.gameObject);
+        hallControl.CreateRoomDlg_ExitClick();
     }
 
 

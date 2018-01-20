@@ -158,43 +158,57 @@ namespace qp_server
   {
     public pb_room_cfg() {}
     
+    private string _room_name;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"room_name", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public string room_name
+    {
+      get { return _room_name; }
+      set { _room_name = value; }
+    }
+    private bool _is_aa;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"is_aa", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public bool is_aa
+    {
+      get { return _is_aa; }
+      set { _is_aa = value; }
+    }
     private int _double_down_score;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"double_down_score", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"double_down_score", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public int double_down_score
     {
       get { return _double_down_score; }
       set { _double_down_score = value; }
     }
     private bool _is_laizi_playmethod;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"is_laizi_playmethod", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"is_laizi_playmethod", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public bool is_laizi_playmethod
     {
       get { return _is_laizi_playmethod; }
       set { _is_laizi_playmethod = value; }
     }
     private bool _is_ob;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"is_ob", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"is_ob", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public bool is_ob
     {
       get { return _is_ob; }
       set { _is_ob = value; }
     }
     private bool _is_random;
-    [global::ProtoBuf.ProtoMember(4, IsRequired = true, Name=@"is_random", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(6, IsRequired = true, Name=@"is_random", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public bool is_random
     {
       get { return _is_random; }
       set { _is_random = value; }
     }
     private bool _is_not_voice;
-    [global::ProtoBuf.ProtoMember(5, IsRequired = true, Name=@"is_not_voice", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(7, IsRequired = true, Name=@"is_not_voice", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public bool is_not_voice
     {
       get { return _is_not_voice; }
       set { _is_not_voice = value; }
     }
     private bool _is_safe_mode;
-    [global::ProtoBuf.ProtoMember(6, IsRequired = true, Name=@"is_safe_mode", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(8, IsRequired = true, Name=@"is_safe_mode", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public bool is_safe_mode
     {
       get { return _is_safe_mode; }

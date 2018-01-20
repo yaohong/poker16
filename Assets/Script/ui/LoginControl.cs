@@ -7,7 +7,6 @@ public class LoginControl : MonoBehaviourX, IScene
 {
 
     //checkbox
-    public UIToggle agreedCheckBox;
 	// Use this for initialization
     public GameObject accountLoginDlgTempalte;
     public GameObject dlgParentObj;
@@ -16,6 +15,7 @@ public class LoginControl : MonoBehaviourX, IScene
     /// ////////////////////////////////////
     /// </summary>
     private AccountLoginDlgControl accountLoginControl = null;
+    private BlockedControl blockedControl = null;
 	void Start () {
 		
 	}
@@ -31,44 +31,74 @@ public class LoginControl : MonoBehaviourX, IScene
         Scheduling.Ins.ChangeScene(SceneType.ST_Hall);
     }
 
+    //账号登陆面板的回调请求
     public void AccLoginBtnClick()
     {
         CreateAccountLoginDlg();
     }
 
-
     /////////////////////////////////////
+    //账号登录框点击等级
     public void AccountLogin(string acc, string pwd)
     {
         //点击了账号登录框的确认
-        //TcpManager.Ins.ConnectByIpPort();
+
+        if (!TcpManager.Ins.ConnectByIpPort(GlobalData.Ins.serverIp, GlobalData.Ins.serverPort))
+        {
+            accountLoginControl.SetState("链接服务器失败");
+            return;
+        }
+
+        //保存登陆信息
+        GlobalData.Ins.loginType = LoginType.LT_Account;
+        GlobalData.Ins.loginAcc = acc;
+        GlobalData.Ins.loginPwd = pwd;
+
+        //弹出遮挡板
+        blockedControl = Common.Ins.CreateBlocked(dlgParentObj);
+        blockedControl.SetState("正在链接服务器");
     }
 
+    //账号登录框点击退出
     public void ExitAccountLoginDlg()
     {
         //点击了账号登录框的退出
         DestoryAccountLoginDlg();
     }
 
+
     /// <summary>
     /// 实现的接口函数
     /// </summary>
     public void OnConnectSuccess()
     {
+        blockedControl.SetState("链接服务器成功,验证账号密码");
         qp_server.qp_login_req req = new qp_server.qp_login_req();
-        req.account = "yaohong";
-        req.pwd = "231344781";
+        req.account = GlobalData.Ins.loginAcc;
+        req.pwd = GlobalData.Ins.loginPwd;
 
         byte[] buff = CmdBase.ProtoBufSerialize<qp_server.qp_login_req>(req);
         TcpManager.Ins.SendData((int)qp_server.ws_cmd.CMD_QP_LOGIN_REQ, buff);
     }
     public void OnConnectFailed()
     {
-
+        DestoryBlocked();
+        if (accountLoginControl != null)
+        {
+            accountLoginControl.SetState("链接服务器失败");
+        }
+        
+        
     }
     public void OnDisconnect()
     {
-
+        Log.Logic("scene[login], disconnect");
+        DestoryBlocked();
+        if (accountLoginControl != null)
+        {
+            accountLoginControl.SetState("服务器断开链接");
+        }
+        
     }
 
     public void OnCompletePacket(qp_server.qp_packet packet)
@@ -122,8 +152,9 @@ public class LoginControl : MonoBehaviourX, IScene
     }
     public void ExitScene()
     {
-        //清楚场景生成的各种对象
+        //清楚场景生成的各种对象(销毁_MESSAGEBOX下的所有对象)
         DestoryAccountLoginDlg();
+        DestoryBlocked();
         //隐藏自己
         gameObject.SetActive(false);
     }
@@ -138,6 +169,20 @@ public class LoginControl : MonoBehaviourX, IScene
             rsp.public_data.nick_name,
             rsp.public_data.avatar_url,
             rsp.private_data.room_card_count);
+        if (rsp.state != 0)
+        {
+            DestoryBlocked();
+            if (accountLoginControl != null)
+            {
+                accountLoginControl.SetState("账号验证失败");
+            }
+        }
+        else
+        {
+            DestoryBlocked();
+            Scheduling.Ins.ChangeScene(SceneType.ST_Hall);
+        }
+
     }
 
     void OnPingRsp(qp_server.qp_ping_rsp rsp)
@@ -169,6 +214,15 @@ public class LoginControl : MonoBehaviourX, IScene
         {
             GameObject.DestroyObject(accountLoginControl.gameObject);
             accountLoginControl = null;
+        }
+    }
+
+    void DestoryBlocked()
+    {
+        if (blockedControl != null)
+        {
+            GameObject.DestroyObject(blockedControl.gameObject);
+            blockedControl = null;
         }
     }
 }
