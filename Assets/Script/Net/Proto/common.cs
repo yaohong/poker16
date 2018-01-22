@@ -148,6 +148,31 @@ namespace qp_server
       get { return _private_data; }
       set { _private_data = value; }
     }
+    private int? _server_scene;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"server_scene", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int server_scene
+    {
+      get { return _server_scene?? default(int); }
+      set { _server_scene = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    
+    public bool server_sceneSpecified
+    {
+      get { return this._server_scene != null; }
+      set { if (value == (this._server_scene== null)) this._server_scene = value ? this.server_scene : (int?)null; }
+    }
+    private bool ShouldSerializeserver_scene() { return server_sceneSpecified; }
+    private void Resetserver_scene() { server_sceneSpecified = false; }
+    
+    private qp_server.pb_room_data _room_data = null;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public qp_server.pb_room_data room_data
+    {
+      get { return _room_data; }
+      set { _room_data = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -214,6 +239,13 @@ namespace qp_server
       get { return _is_safe_mode; }
       set { _is_safe_mode = value; }
     }
+    private readonly global::System.Collections.Generic.List<int> _lock_userid_list = new global::System.Collections.Generic.List<int>();
+    [global::ProtoBuf.ProtoMember(9, Name=@"lock_userid_list", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public global::System.Collections.Generic.List<int> lock_userid_list
+    {
+      get { return _lock_userid_list; }
+    }
+  
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -265,14 +297,6 @@ namespace qp_server
     private bool ShouldSerializeroom_id() { return room_idSpecified; }
     private void Resetroom_id() { room_idSpecified = false; }
     
-    private qp_server.pb_room_cfg _cfg = null;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"cfg", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public qp_server.pb_room_cfg cfg
-    {
-      get { return _cfg; }
-      set { _cfg = value; }
-    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -290,6 +314,47 @@ namespace qp_server
       get { return _room_id; }
       set { _room_id = value; }
     }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::ProtoBuf.ProtoContract(Name=@"pb_room_data")]
+  public partial class pb_room_data : global::ProtoBuf.IExtensible
+  {
+    public pb_room_data() {}
+    
+    private qp_server.pb_room_cfg _cfg;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"cfg", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public qp_server.pb_room_cfg cfg
+    {
+      get { return _cfg; }
+      set { _cfg = value; }
+    }
+    private readonly global::System.Collections.Generic.List<qp_server.pb_room_user> _room_users = new global::System.Collections.Generic.List<qp_server.pb_room_user>();
+    [global::ProtoBuf.ProtoMember(2, Name=@"room_users", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<qp_server.pb_room_user> room_users
+    {
+      get { return _room_users; }
+    }
+  
+    private byte[] _game_data;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"game_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] game_data
+    {
+      get { return _game_data?? null; }
+      set { _game_data = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    
+    public bool game_dataSpecified
+    {
+      get { return this._game_data != null; }
+      set { if (value == (this._game_data== null)) this._game_data = value ? this.game_data : (byte[])null; }
+    }
+    private bool ShouldSerializegame_data() { return game_dataSpecified; }
+    private void Resetgame_data() { game_dataSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -331,13 +396,14 @@ namespace qp_server
       get { return _result; }
       set { _result = value; }
     }
-    private readonly global::System.Collections.Generic.List<qp_server.pb_room_user> _room_users = new global::System.Collections.Generic.List<qp_server.pb_room_user>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"room_users", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<qp_server.pb_room_user> room_users
+    private qp_server.pb_room_data _room_data = null;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public qp_server.pb_room_data room_data
     {
-      get { return _room_users; }
+      get { return _room_data; }
+      set { _room_data = value; }
     }
-  
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

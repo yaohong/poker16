@@ -152,7 +152,7 @@ public class LoginControl : MonoBehaviourX, IScene
     }
     public void ExitScene()
     {
-        //清楚场景生成的各种对象(销毁_MESSAGEBOX下的所有对象)
+        //清除场景生成的各种对象(销毁_MESSAGEBOX下的所有对象)
         DestoryAccountLoginDlg();
         DestoryBlocked();
         //隐藏自己
@@ -163,12 +163,7 @@ public class LoginControl : MonoBehaviourX, IScene
 
     void OnLoginRsp(qp_server.qp_login_rsp rsp)
     {
-        Log.Logic(
-            "state={0}, nickname={1} avatarUrl={2} roomCardCount={3}",
-            rsp.state,
-            rsp.public_data.nick_name,
-            rsp.public_data.avatar_url,
-            rsp.private_data.room_card_count);
+        Log.Logic("login_rsp state={0}",rsp.state);
         if (rsp.state != 0)
         {
             DestoryBlocked();

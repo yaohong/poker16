@@ -88,7 +88,8 @@ public class HallControl : MonoBehaviour, IScene
         cfg.is_random = isRandom;
         cfg.is_not_voice = isNotVoice;
         cfg.is_safe_mode = isSafeMode;
-
+        cfg.lock_userid_list.Add(10001);
+        cfg.lock_userid_list.Add(10002);
         req.cfg = cfg;
 
         byte[] buff = CmdBase.ProtoBufSerialize<qp_server.qp_create_room_req>(req);
@@ -118,8 +119,70 @@ public class HallControl : MonoBehaviour, IScene
 
     public void OnCompletePacket(qp_server.qp_packet packet)
     {
+        switch ((qp_server.ws_cmd)packet.cmd)
+        {
+            //case qp_server.ws_cmd.CMD_QP_LOGIN_RSP:
+            //    OnLoginRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_login_rsp>(packet.serialized));
+            //    break;
+            case qp_server.ws_cmd.CMD_QP_CREATE_ROOM_RSP:
+                OnCreateRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_create_room_rsp>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_JOIN_ROOM_RSP:
+                OnJoinRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_join_room_rsp>(packet.serialized));
+                break;
+            //case qp_server.ws_cmd.CMD_QP_JOIN_ROOM_PUSH:
+            //    OnJoinRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_join_room_push>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_SITDOWN_RSP:
+            //    OnSitdownRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_sitdown_rsp>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_SITDOWN_PUSH:
+            //    OnSitdownPush(CmdBase.ProtoBufDeserialize<qp_server.qp_sitdown_push>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_STANDUP_RSP:
+            //    OnStandupRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_standup_rsp>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_STANDUP_PUSH:
+            //    OnStandupPush(CmdBase.ProtoBufDeserialize<qp_server.qp_standup_push>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_EXIT_ROOM_RSP:
+            //    OnExitRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_exit_room_rsp>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_EXIT_ROOM_PUSH:
+            //    OnExitRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_exit_room_push>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_GAME_DATA:
+            //    OnGameData(CmdBase.ProtoBufDeserialize<qp_server.qp_game_data>(qpPacket.serialized));
+            //    break;
+            //case qp_server.ws_cmd.CMD_QP_PING_RSP:
+            //    break;
+            default:
+                Log.Error("currentScene[LOGIN], unknown cmd={0}", packet.cmd);
+                break;
+        }
+    }
+
+    void OnCreateRoomRsp(qp_server.qp_create_room_rsp rsp)
+    {
+        Log.Logic(
+            "OnCreateRoomRsp, state={0}, room_id={1}",
+            rsp.state,
+            rsp.room_idSpecified ? rsp.room_id : 0);
 
     }
+
+    void OnJoinRoomRsp(qp_server.qp_join_room_rsp rsp)
+    {
+        Log.Logic(
+            "OnJoinRoomRsp, state={0}",
+            rsp.result);
+
+    }
+
+
+    /// <summary>
+    /// ///////////////////////////////
+    /// </summary>
 
     public void EnterScene()
     {
