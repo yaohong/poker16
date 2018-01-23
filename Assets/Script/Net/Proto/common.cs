@@ -396,8 +396,25 @@ namespace qp_server
       get { return _result; }
       set { _result = value; }
     }
+    private int? _room_id;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"room_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int room_id
+    {
+      get { return _room_id?? default(int); }
+      set { _room_id = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    
+    public bool room_idSpecified
+    {
+      get { return this._room_id != null; }
+      set { if (value == (this._room_id== null)) this._room_id = value ? this.room_id : (int?)null; }
+    }
+    private bool ShouldSerializeroom_id() { return room_idSpecified; }
+    private void Resetroom_id() { room_idSpecified = false; }
+    
     private qp_server.pb_room_data _room_data = null;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
     public qp_server.pb_room_data room_data
     {
