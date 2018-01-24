@@ -148,25 +148,8 @@ namespace qp_server
       get { return _private_data; }
       set { _private_data = value; }
     }
-    private int? _server_scene;
-    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"server_scene", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int server_scene
-    {
-      get { return _server_scene?? default(int); }
-      set { _server_scene = value; }
-    }
-    [global::System.Xml.Serialization.XmlIgnore]
-    
-    public bool server_sceneSpecified
-    {
-      get { return this._server_scene != null; }
-      set { if (value == (this._server_scene== null)) this._server_scene = value ? this.server_scene : (int?)null; }
-    }
-    private bool ShouldSerializeserver_scene() { return server_sceneSpecified; }
-    private void Resetserver_scene() { server_sceneSpecified = false; }
-    
     private qp_server.pb_room_data _room_data = null;
-    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
     public qp_server.pb_room_data room_data
     {
@@ -324,22 +307,29 @@ namespace qp_server
   {
     public pb_room_data() {}
     
+    private int _room_id;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"room_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int room_id
+    {
+      get { return _room_id; }
+      set { _room_id = value; }
+    }
     private qp_server.pb_room_cfg _cfg;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"cfg", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"cfg", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public qp_server.pb_room_cfg cfg
     {
       get { return _cfg; }
       set { _cfg = value; }
     }
     private readonly global::System.Collections.Generic.List<qp_server.pb_room_user> _room_users = new global::System.Collections.Generic.List<qp_server.pb_room_user>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"room_users", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(3, Name=@"room_users", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<qp_server.pb_room_user> room_users
     {
       get { return _room_users; }
     }
   
     private byte[] _game_data;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"game_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"game_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public byte[] game_data
     {
       get { return _game_data?? null; }
@@ -396,25 +386,8 @@ namespace qp_server
       get { return _result; }
       set { _result = value; }
     }
-    private int? _room_id;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"room_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int room_id
-    {
-      get { return _room_id?? default(int); }
-      set { _room_id = value; }
-    }
-    [global::System.Xml.Serialization.XmlIgnore]
-    
-    public bool room_idSpecified
-    {
-      get { return this._room_id != null; }
-      set { if (value == (this._room_id== null)) this._room_id = value ? this.room_id : (int?)null; }
-    }
-    private bool ShouldSerializeroom_id() { return room_idSpecified; }
-    private void Resetroom_id() { room_idSpecified = false; }
-    
     private qp_server.pb_room_data _room_data = null;
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"room_data", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
     public qp_server.pb_room_data room_data
     {

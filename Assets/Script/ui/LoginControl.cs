@@ -73,12 +73,7 @@ public class LoginControl : MonoBehaviourX, IScene
     public void OnConnectSuccess()
     {
         blockedControl.SetState("链接服务器成功,验证账号密码");
-        qp_server.qp_login_req req = new qp_server.qp_login_req();
-        req.account = GlobalData.Ins.loginAcc;
-        req.pwd = GlobalData.Ins.loginPwd;
-
-        byte[] buff = CmdBase.ProtoBufSerialize<qp_server.qp_login_req>(req);
-        TcpManager.Ins.SendData((int)qp_server.ws_cmd.CMD_QP_LOGIN_REQ, buff);
+        NetPacketHandle.SendLoginReq();
     }
     public void OnConnectFailed()
     {
@@ -108,38 +103,6 @@ public class LoginControl : MonoBehaviourX, IScene
             case qp_server.ws_cmd.CMD_QP_LOGIN_RSP:
                 OnLoginRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_login_rsp>(packet.serialized));
                 break;
-            //case qp_server.ws_cmd.CMD_QP_CREATE_ROOM_RSP:
-            //    OnCreateRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_create_room_rsp>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_JOIN_ROOM_RSP:
-            //    OnJoinRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_join_room_rsp>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_JOIN_ROOM_PUSH:
-            //    OnJoinRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_join_room_push>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_SITDOWN_RSP:
-            //    OnSitdownRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_sitdown_rsp>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_SITDOWN_PUSH:
-            //    OnSitdownPush(CmdBase.ProtoBufDeserialize<qp_server.qp_sitdown_push>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_STANDUP_RSP:
-            //    OnStandupRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_standup_rsp>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_STANDUP_PUSH:
-            //    OnStandupPush(CmdBase.ProtoBufDeserialize<qp_server.qp_standup_push>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_EXIT_ROOM_RSP:
-            //    OnExitRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_exit_room_rsp>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_EXIT_ROOM_PUSH:
-            //    OnExitRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_exit_room_push>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_GAME_DATA:
-            //    OnGameData(CmdBase.ProtoBufDeserialize<qp_server.qp_game_data>(qpPacket.serialized));
-            //    break;
-            //case qp_server.ws_cmd.CMD_QP_PING_RSP:
-            //    break;
             default:
                 Log.Error("currentScene[LOGIN], unknown cmd={0}", packet.cmd);
                 break;
@@ -175,7 +138,7 @@ public class LoginControl : MonoBehaviourX, IScene
         else
         {
             DestoryBlocked();
-            Scheduling.Ins.ChangeScene(SceneType.ST_Hall);
+            NetPacketHandle.LoginRspHandle(rsp);
         }
 
     }

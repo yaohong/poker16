@@ -10,7 +10,6 @@ public class RoomSeatUser : MonoBehaviour {
 
     private string nickname;
     private string avatarUrl;
-    private int seatNumber;
     
 	void Start () {
 		
@@ -20,11 +19,6 @@ public class RoomSeatUser : MonoBehaviour {
 	void Update () {
 		
 	}
-
-    public void SetSeatNumber(int tmpSeatNumber)
-    {
-        seatNumber = tmpSeatNumber;
-    }
 
     public void Sitdown(string tmpNickname, string tmpAvatarUrl)
     {

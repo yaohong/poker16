@@ -224,6 +224,7 @@ public class TcpManager : MonoBehaviourX
             if (!tcpSocket.SendData(cmd, data))
             {
                 //发送数据失败了，销毁当前套接字
+                Log.Logic("sendData faild");
                 OnDisconnect();
             }
             else

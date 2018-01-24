@@ -7,7 +7,7 @@ public enum SceneType
     ST_None,
     ST_Login,                  //登陆场景
     ST_Hall,                   //大厅
-    ST_Game                    //游戏界面
+    ST_Room                    //房间
 }
 
 public interface IScene
@@ -27,7 +27,7 @@ public class Scheduling : MonoBehaviourX
 {
     public GameObject loginObject;
     public GameObject hallControl;
-    public GameObject gameControl;
+    public GameObject roomControl;
 
     public SceneType currentSceneType = SceneType.ST_None;
     static Scheduling ins = null;
@@ -57,7 +57,7 @@ public class Scheduling : MonoBehaviourX
 	void Start () {
         sceneMap[SceneType.ST_Login] = loginObject.GetComponent<IScene>();
         sceneMap[SceneType.ST_Hall] = hallControl.GetComponent<IScene>();
-        sceneMap[SceneType.ST_Game] = gameControl.GetComponent<IScene>();
+        sceneMap[SceneType.ST_Room] = roomControl.GetComponent<IScene>();
 
         scope.Listen("ConnectSuccess", new CALLBACK(OnConnectSuccess));
         scope.Listen("ConnectFailed", new CALLBACK(OnConnectFailed));
