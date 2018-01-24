@@ -73,6 +73,11 @@ public class HallControl : MonoBehaviour, IScene
         CreateCreateRoomDlg();
     }
 
+    public void JoinRoomClick()
+    {
+
+    }
+
     /// <summary>
     /// 子窗口(创建房间窗口)的回调
     /// </summary>
@@ -158,10 +163,10 @@ public class HallControl : MonoBehaviour, IScene
                 OnJoinRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_join_room_rsp>(packet.serialized));
                 break;
             case qp_server.ws_cmd.CMD_QP_PING_RSP:
-                Log.Error("currentScene[LOGIN], ping_rsp");
+                Log.Error("currentScene[HALL], ping_rsp");
                 break;
             default:
-                Log.Error("currentScene[LOGIN], unknown cmd={0}", packet.cmd);
+                Log.Error("currentScene[HALL], unknown cmd={0}", packet.cmd);
                 break;
         }
     }

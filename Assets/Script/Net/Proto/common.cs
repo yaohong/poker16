@@ -445,6 +445,23 @@ namespace qp_server
       get { return _result; }
       set { _result = value; }
     }
+    private int? _seat_num;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"seat_num", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int seat_num
+    {
+      get { return _seat_num?? default(int); }
+      set { _seat_num = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    
+    public bool seat_numSpecified
+    {
+      get { return this._seat_num != null; }
+      set { if (value == (this._seat_num== null)) this._seat_num = value ? this.seat_num : (int?)null; }
+    }
+    private bool ShouldSerializeseat_num() { return seat_numSpecified; }
+    private void Resetseat_num() { seat_numSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -479,22 +496,22 @@ namespace qp_server
   {
     public qp_standup_req() {}
     
-    private int? _noop;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"noop", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int noop
+    private int? _seat_num;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"seat_num", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int seat_num
     {
-      get { return _noop?? default(int); }
-      set { _noop = value; }
+      get { return _seat_num?? default(int); }
+      set { _seat_num = value; }
     }
     [global::System.Xml.Serialization.XmlIgnore]
     
-    public bool noopSpecified
+    public bool seat_numSpecified
     {
-      get { return this._noop != null; }
-      set { if (value == (this._noop== null)) this._noop = value ? this.noop : (int?)null; }
+      get { return this._seat_num != null; }
+      set { if (value == (this._seat_num== null)) this._seat_num = value ? this.seat_num : (int?)null; }
     }
-    private bool ShouldSerializenoop() { return noopSpecified; }
-    private void Resetnoop() { noopSpecified = false; }
+    private bool ShouldSerializeseat_num() { return seat_numSpecified; }
+    private void Resetseat_num() { seat_numSpecified = false; }
     
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

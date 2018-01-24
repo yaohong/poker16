@@ -34,6 +34,27 @@ public class RoomControl : MonoBehaviourX, IScene
 	}
 
 
+    public void StandupOrSitdownBtnClick()
+    {
+        if (GlobalData.Ins.currentSeatNumber == -1)
+        {
+            //坐下
+            qp_server.qp_sitdown_req req = new qp_server.qp_sitdown_req();
+            req.seat_num = -1;
+            byte[] bin = CmdBase.ProtoBufSerialize<qp_server.qp_sitdown_req>(req);
+            TcpManager.Ins.SendData((int)qp_server.ws_cmd.CMD_QP_SITDOWN_REQ, bin);
+        }
+        else
+        {
+            //起立
+            qp_server.qp_standup_req req = new qp_server.qp_standup_req();
+            req.seat_num = GlobalData.Ins.currentSeatNumber;
+            byte[] bin = CmdBase.ProtoBufSerialize<qp_server.qp_standup_req>(req);
+            TcpManager.Ins.SendData((int)qp_server.ws_cmd.CMD_QP_STANDUP_REQ, bin);
+        }
+    }
+
+
     /// <summary>
     /// IScene的接口
     /// </summary>
@@ -75,8 +96,23 @@ public class RoomControl : MonoBehaviourX, IScene
             case qp_server.ws_cmd.CMD_QP_PING_RSP:
                 Log.Error("currentScene[LOGIN], ping_rsp");
                 break;
+            case qp_server.ws_cmd.CMD_QP_JOIN_ROOM_PUSH:
+                OnJoinRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_join_room_push>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_SITDOWN_RSP:
+                OnSitdownRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_sitdown_rsp>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_SITDOWN_PUSH:
+                OnSitdownPush(CmdBase.ProtoBufDeserialize<qp_server.qp_sitdown_push>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_STANDUP_RSP:
+                OnStandupRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_standup_rsp>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_STANDUP_PUSH:
+                OnStandupPush(CmdBase.ProtoBufDeserialize<qp_server.qp_standup_push>(packet.serialized));
+                break;
             default:
-                Log.Error("currentScene[LOGIN], unknown cmd={0}", packet.cmd);
+                Log.Error("currentScene[ROOM], unknown cmd={0}", packet.cmd);
                 break;
         }
     }
@@ -96,20 +132,85 @@ public class RoomControl : MonoBehaviourX, IScene
 
     }
 
+    void OnJoinRoomPush(qp_server.qp_join_room_push push)
+    {
+        Log.Logic("room JoinRoomPush ");
+        qp_server.pb_user_public_data publicData = push.public_data;
+        //将玩家数据添加到缓存
+        if (GlobalData.Ins.allRoomUsers.ContainsKey(publicData.user_id))
+        {
+            Log.Warning("user_id[{0}] exist.", publicData.user_id);
+            return;
+        }
+
+        RoomUser newRoomUser = new RoomUser(publicData.user_id, publicData.nick_name, publicData.avatar_url, -1);
+        GlobalData.Ins.allRoomUsers[publicData.user_id] = newRoomUser;
+    }
+
+
+    void OnSitdownRsp(qp_server.qp_sitdown_rsp rsp)
+    {
+        Log.Logic("room SitdownRsp, state={0} ", rsp.result);
+        if (rsp.result == 0)
+        {
+            //成功坐下
+            Log.Logic("serverNumber={0} ", rsp.seat_num);
+            RoomUser roomUser = GlobalData.Ins.allRoomUsers[GlobalData.Ins.userId];
+            roomUser.seatNumber = rsp.seat_num;
+            seatUsers[roomUser.seatNumber].Sitdown(roomUser.nickname, roomUser.avatarUrl);
+
+            GlobalData.Ins.currentSeatNumber = rsp.seat_num;
+        }
+    }
+
+    void OnSitdownPush(qp_server.qp_sitdown_push push)
+    {
+        Log.Logic("room SitdownPush {0} {1}", push.user_id, push.seat_num);
+        RoomUser roomUser = GlobalData.Ins.allRoomUsers[push.seat_num];
+        roomUser.seatNumber = push.seat_num;
+        seatUsers[push.seat_num].Sitdown(roomUser.nickname, roomUser.avatarUrl);
+    }
+
+    void OnStandupRsp(qp_server.qp_standup_rsp rsp)
+    {
+        Log.Logic("room StandupRsp {0}", rsp.state);
+        if (rsp.state == 0)
+        {
+            RoomUser roomUser = GlobalData.Ins.allRoomUsers[GlobalData.Ins.userId];
+            seatUsers[roomUser.seatNumber].Standup();
+            roomUser.seatNumber = -1;
+            GlobalData.Ins.currentSeatNumber = -1;
+        }
+    }
+
+    void OnStandupPush(qp_server.qp_standup_push push)
+    {
+        Log.Logic("room StandupPush");
+        RoomUser roomUser = GlobalData.Ins.allRoomUsers[push.seat_num];
+        seatUsers[push.seat_num].Standup();
+        roomUser.seatNumber = -1;
+    }
+
+    /// <summary>
+    /// IScene接口的实现
+    /// </summary>
     public void EnterScene()
     {
         //初始化显示信息
+        
+        for (int i = 0; i < seatUsers.Length; i++)
+        {
+            seatUsers[i].Standup();
+        }
+
         ShowPlayMethod(GlobalData.Ins.roomCfg.isAa, GlobalData.Ins.roomCfg.isLaiziPlaymethod, GlobalData.Ins.roomCfg.doubleDownScore);
         ShowMode(GlobalData.Ins.roomCfg.isRandom);
         ShowSeatUser();
         ShowRoomNumber(GlobalData.Ins.currentRoomId);
         lastSendPingTime = Time.time;
         Log.Logic("EnterScene[ROOM] lastSendPingTime={0}, space_time={1}", lastSendPingTime, GlobalData.Ins.PING_SPACE_TIME);
-        for (int i = 0; i < seatUsers.Length; i++)
-        {
-            seatUsers[i].Standup();
-        }
         gameObject.SetActive(true);
+        
     }
     public void ExitScene()
     {
