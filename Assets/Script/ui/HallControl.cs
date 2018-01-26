@@ -8,13 +8,16 @@ public class HallControl : MonoBehaviour, IScene
 
     //public UIScrollView roomInfoPanelContainer;
     public GameObject createRoomDlgTempalte;
+    public GameObject joinRoomDlgTempalte;
     public GameObject dlgParentObj;
 
     public RoomViewControl roomViewControl;
 	// Use this for initialization
 
     private BlockedControl blockedControl;
-    private CreateRoomDlgControl createRoomDlgControl;
+
+    private CreateRoomDlgControl createRoomDlgControl = null;
+    private JoinRoomDlgControl joinRoomDlgControl = null;
 
     private float lastSendPingTime;
 	void Start () {
@@ -75,7 +78,7 @@ public class HallControl : MonoBehaviour, IScene
 
     public void JoinRoomClick()
     {
-
+        CreateJoinRoomDlg();
     }
 
     /// <summary>
@@ -115,6 +118,22 @@ public class HallControl : MonoBehaviour, IScene
     public void CreateRoomDlg_ExitClick()
     {
         DestoryCreateRoomDlg();
+    }
+
+
+    public void JoinRoomDlg_JoinRoomClick(int roomId)
+    {
+        Log.Logic("JoinRoomClick roomId={0}", roomId);
+        qp_server.qp_join_room_req req = new qp_server.qp_join_room_req();
+        req.room_id = roomId;
+
+        byte[] buff = CmdBase.ProtoBufSerialize<qp_server.qp_join_room_req>(req);
+        TcpManager.Ins.SendData((int)qp_server.ws_cmd.CMD_QP_JOIN_ROOM_REQ, buff);
+    }
+
+    public void JoinRoomDlg_ExitClick()
+    {
+        DestoryJoinRoomDlg();
     }
 
     /// <summary>
@@ -211,8 +230,10 @@ public class HallControl : MonoBehaviour, IScene
         else
         {
             //设置房间信息
-            GlobalData.Ins.SetRoomData(rsp.room_data);
-            Scheduling.Ins.ChangeScene(SceneType.ST_Room);
+            Scheduling.Ins.ChangeScene(SceneType.ST_Room, delegate()
+            {
+                GlobalData.Ins.SetRoomData(rsp.room_data);
+            });
         }
     }
 
@@ -232,6 +253,7 @@ public class HallControl : MonoBehaviour, IScene
     {
         roomViewControl.ClearAllRoomInfo();
         DestoryCreateRoomDlg();
+        DestoryJoinRoomDlg();
         DestoryBlocked();
         gameObject.SetActive(false);
     }
@@ -260,6 +282,30 @@ public class HallControl : MonoBehaviour, IScene
         {
             GameObject.DestroyObject(createRoomDlgControl.gameObject);
             createRoomDlgControl = null;
+        }
+    }
+
+    void CreateJoinRoomDlg()
+    {
+        DestoryJoinRoomDlg();
+
+        GameObject joinRoomDlgObj = GameObject.Instantiate(joinRoomDlgTempalte);
+        JoinRoomDlgControl control = joinRoomDlgObj.GetComponent<JoinRoomDlgControl>();
+        control.SetHallControl(this);
+
+        joinRoomDlgObj.transform.parent = dlgParentObj.transform;
+        joinRoomDlgObj.transform.localScale = Vector3.one;
+        joinRoomDlgObj.transform.localPosition = Vector3.one;
+
+        joinRoomDlgControl = control;
+    }
+
+    void DestoryJoinRoomDlg()
+    {
+        if (joinRoomDlgControl != null)
+        {
+            GameObject.DestroyObject(joinRoomDlgControl.gameObject);
+            joinRoomDlgControl = null;
         }
     }
 

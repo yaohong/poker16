@@ -23,6 +23,9 @@ public interface IScene
     
 }
 
+
+public delegate void ChangeInitFunc();
+
 public class Scheduling : MonoBehaviourX
 {
     public GameObject loginObject;
@@ -74,6 +77,20 @@ public class Scheduling : MonoBehaviourX
         {
             currentScene.ExitScene();
         }
+
+        currentScene = sceneMap[type];
+        currentSceneType = type;
+        currentScene.EnterScene();
+    }
+
+    public void ChangeScene(SceneType type, ChangeInitFunc func)
+    {
+        if (currentScene != null)
+        {
+            currentScene.ExitScene();
+        }
+
+        func();
 
         currentScene = sceneMap[type];
         currentSceneType = type;

@@ -27,11 +27,19 @@ public class RoomControl : MonoBehaviourX, IScene
             if (curTime - lastSendPingTime > GlobalData.Ins.PING_SPACE_TIME)
             {
                 Log.Logic("send_ping cur=[{0}]", curTime);
-                NetPacketHandle.SendPing();
+                //NetPacketHandle.SendPing();
                 lastSendPingTime = curTime;
             }
         }
 	}
+
+    public void ExitBtnClick() 
+    {
+        qp_server.qp_exit_room_req req = new qp_server.qp_exit_room_req();
+        req.seat_num = GlobalData.Ins.currentSeatNumber;
+        byte[] bin = CmdBase.ProtoBufSerialize<qp_server.qp_exit_room_req>(req);
+        TcpManager.Ins.SendData((int)qp_server.ws_cmd.CMD_QP_EXIT_ROOM_REQ, bin);
+    }
 
 
     public void StandupOrSitdownBtnClick()
@@ -81,7 +89,7 @@ public class RoomControl : MonoBehaviourX, IScene
             Scheduling.Ins.ChangeScene(SceneType.ST_Login);
             return;
         }
-
+        
         blockedControl = Common.Ins.CreateBlocked(dlgParentObj);
         blockedControl.SetState("服务器断开,正在重连");
     }
@@ -92,9 +100,6 @@ public class RoomControl : MonoBehaviourX, IScene
         {
             case qp_server.ws_cmd.CMD_QP_LOGIN_RSP:
                 OnLoginRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_login_rsp>(packet.serialized));
-                break;
-            case qp_server.ws_cmd.CMD_QP_PING_RSP:
-                Log.Error("currentScene[LOGIN], ping_rsp");
                 break;
             case qp_server.ws_cmd.CMD_QP_JOIN_ROOM_PUSH:
                 OnJoinRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_join_room_push>(packet.serialized));
@@ -110,6 +115,15 @@ public class RoomControl : MonoBehaviourX, IScene
                 break;
             case qp_server.ws_cmd.CMD_QP_STANDUP_PUSH:
                 OnStandupPush(CmdBase.ProtoBufDeserialize<qp_server.qp_standup_push>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_EXIT_ROOM_RSP:
+                OnExitRoomRsp(CmdBase.ProtoBufDeserialize<qp_server.qp_exit_room_rsp>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_EXIT_ROOM_PUSH:
+                OnExitRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_exit_room_push>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_PING_RSP:
+                Log.Error("currentScene[ROOM], ping_rsp");
                 break;
             default:
                 Log.Error("currentScene[ROOM], unknown cmd={0}", packet.cmd);
@@ -134,8 +148,9 @@ public class RoomControl : MonoBehaviourX, IScene
 
     void OnJoinRoomPush(qp_server.qp_join_room_push push)
     {
-        Log.Logic("room JoinRoomPush ");
+        
         qp_server.pb_user_public_data publicData = push.public_data;
+        Log.Logic("room JoinRoomPush {0}", publicData.user_id);
         //将玩家数据添加到缓存
         if (GlobalData.Ins.allRoomUsers.ContainsKey(publicData.user_id))
         {
@@ -166,7 +181,7 @@ public class RoomControl : MonoBehaviourX, IScene
     void OnSitdownPush(qp_server.qp_sitdown_push push)
     {
         Log.Logic("room SitdownPush {0} {1}", push.user_id, push.seat_num);
-        RoomUser roomUser = GlobalData.Ins.allRoomUsers[push.seat_num];
+        RoomUser roomUser = GlobalData.Ins.allRoomUsers[push.user_id];
         roomUser.seatNumber = push.seat_num;
         seatUsers[push.seat_num].Sitdown(roomUser.nickname, roomUser.avatarUrl);
     }
@@ -185,10 +200,59 @@ public class RoomControl : MonoBehaviourX, IScene
 
     void OnStandupPush(qp_server.qp_standup_push push)
     {
-        Log.Logic("room StandupPush");
-        RoomUser roomUser = GlobalData.Ins.allRoomUsers[push.seat_num];
+        Log.Logic("room StandupPush {0}", push.seat_num);
+        int standupUserId = 0;
+        foreach(var item in GlobalData.Ins.allRoomUsers)
+        {
+            if (item.Value.seatNumber == push.seat_num)
+            {
+                standupUserId = item.Key;
+                break;
+            }
+        }
+
+        if (standupUserId == 0)
+        {
+            Log.Error("standupUserId = 0");
+            return;
+        }
+        RoomUser roomUser = GlobalData.Ins.allRoomUsers[standupUserId];
         seatUsers[push.seat_num].Standup();
         roomUser.seatNumber = -1;
+    }
+
+    void OnExitRoomRsp(qp_server.qp_exit_room_rsp rsp)
+    {
+        Log.Logic("room ExitRoomRsp {0}", rsp.result);
+        if (rsp.result == 0)
+        {
+            //退出成功
+            Scheduling.Ins.ChangeScene(SceneType.ST_Hall);
+        }
+    }
+
+    void OnExitRoomPush(qp_server.qp_exit_room_push push)
+    {
+        Log.Logic("room ExitRoomPush {0} {1}", push.user_id, push.seat_num);
+        if (!GlobalData.Ins.allRoomUsers.ContainsKey(push.user_id))
+        {
+            Log.Error("user_id[{0}] not exist.", push.user_id);
+            return;
+        }
+
+        RoomUser roomUser = GlobalData.Ins.allRoomUsers[push.user_id];
+        if (roomUser.seatNumber != push.seat_num)
+        {
+            Log.Error("user_id[{0}] server_seatnumber={1} local_seatnumber={2}.", push.user_id, push.seat_num, roomUser.seatNumber);
+            return;
+        }
+
+        GlobalData.Ins.allRoomUsers.Remove(push.user_id);
+        if (roomUser.seatNumber != -1)
+        {
+            //在座位上
+            seatUsers[roomUser.seatNumber].Standup();
+        }
     }
 
     /// <summary>

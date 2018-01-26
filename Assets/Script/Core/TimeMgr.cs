@@ -58,7 +58,9 @@ public class TimeMgr: ZBSingleton<TimeMgr>
     {
         get
         {
-            return GetServerDateFormat(GetZoneSecond(ServerUTCTime), "yyyy-MM-dd HH:mm:ss");
+            //System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1));
+            //uint timeStamp = (uint)(DateTime.Now - startTime).TotalSeconds;
+            return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
     }
 

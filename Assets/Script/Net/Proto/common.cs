@@ -557,23 +557,13 @@ namespace qp_server
   {
     public qp_exit_room_req() {}
     
-    private int? _noop;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"noop", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int noop
+    private int _seat_num;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"seat_num", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int seat_num
     {
-      get { return _noop?? default(int); }
-      set { _noop = value; }
+      get { return _seat_num; }
+      set { _seat_num = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    
-    public bool noopSpecified
-    {
-      get { return this._noop != null; }
-      set { if (value == (this._noop== null)) this._noop = value ? this.noop : (int?)null; }
-    }
-    private bool ShouldSerializenoop() { return noopSpecified; }
-    private void Resetnoop() { noopSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -607,6 +597,13 @@ namespace qp_server
     {
       get { return _user_id; }
       set { _user_id = value; }
+    }
+    private int _seat_num;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"seat_num", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int seat_num
+    {
+      get { return _seat_num; }
+      set { _seat_num = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

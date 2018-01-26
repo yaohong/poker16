@@ -13,6 +13,7 @@ public class Log
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public static void Logic(string format, params object[] args)
     {
+        format = string.Format("[Logic:{0}]:{1}", timestamp, format);
         Debug.LogFormat(format, args);
     }
 
@@ -24,6 +25,7 @@ public class Log
 
     public static void Error(string format, params object[] args)
     {
+        format = string.Format("[Error:{0}]:{1}", timestamp, format);
         Debug.LogErrorFormat(format, args);
     }
 

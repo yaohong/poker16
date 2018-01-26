@@ -116,6 +116,13 @@ public class TcpSocket
                 return -1;
             }
 
+            if (socket.Poll(0, SelectMode.SelectRead) && socket.Available == 0)
+            {
+                //被对方关闭链接了
+                Log.Network("Remote close");
+                return -1;
+            }
+
             int frameBytes = socket.Available;
             if (frameBytes > 0)
             {

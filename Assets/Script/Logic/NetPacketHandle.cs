@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class NetPacketHandle {
 
 	// Use this for initialization
@@ -21,8 +22,10 @@ public class NetPacketHandle {
         if (rsp.room_data != null)
         {
             //初始化房间信息
-            GlobalData.Ins.SetRoomData(rsp.room_data);
-            Scheduling.Ins.ChangeScene(SceneType.ST_Room);
+
+            Scheduling.Ins.ChangeScene(SceneType.ST_Room, delegate() {
+                GlobalData.Ins.SetRoomData(rsp.room_data); 
+            });
         }
         else
         {

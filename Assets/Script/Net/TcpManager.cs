@@ -21,7 +21,7 @@ public class TcpManager : MonoBehaviourX
 {
 
     public static float CONNECT_TIMEOUT = 5f;       //链接的最长时间
-    public static float RECEIVE_TIMEOUT = 30f;      //30秒没收到数据
+    public static float RECEIVE_TIMEOUT = 300000f;      //30秒没收到数据
 
     protected TcpSocket tcpSocket = null;
     protected EndPoint serverAddr;
