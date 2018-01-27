@@ -27,7 +27,7 @@ public class RoomControl : MonoBehaviourX, IScene
             if (curTime - lastSendPingTime > GlobalData.Ins.PING_SPACE_TIME)
             {
                 Log.Logic("send_ping cur=[{0}]", curTime);
-                //NetPacketHandle.SendPing();
+                NetPacketHandle.SendPing();
                 lastSendPingTime = curTime;
             }
         }
@@ -121,6 +121,12 @@ public class RoomControl : MonoBehaviourX, IScene
                 break;
             case qp_server.ws_cmd.CMD_QP_EXIT_ROOM_PUSH:
                 OnExitRoomPush(CmdBase.ProtoBufDeserialize<qp_server.qp_exit_room_push>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_ROOM_DISSMISS:
+                OnRoomDissmiss(CmdBase.ProtoBufDeserialize<qp_server.qp_room_dissmiss>(packet.serialized));
+                break;
+            case qp_server.ws_cmd.CMD_QP_ROOM_KICK:
+                OnRoomKick(CmdBase.ProtoBufDeserialize<qp_server.qp_room_kick>(packet.serialized));
                 break;
             case qp_server.ws_cmd.CMD_QP_PING_RSP:
                 Log.Error("currentScene[ROOM], ping_rsp");
@@ -253,6 +259,33 @@ public class RoomControl : MonoBehaviourX, IScene
             //在座位上
             seatUsers[roomUser.seatNumber].Standup();
         }
+    }
+
+
+    void OnRoomDissmiss(qp_server.qp_room_dissmiss msg)
+    {
+        Log.Logic("room RoomDissmiss {0} {1}", msg.room_id, msg.type);
+        if (msg.room_id != GlobalData.Ins.currentRoomId)
+        {
+            //和客户端存的房间ID不一样
+            Log.Error("RoomDissmiss, serverRoomId={0}, localServerRoomId={1}", msg.room_id, GlobalData.Ins.currentRoomId);
+            return;
+        }
+
+        Scheduling.Ins.ChangeScene(SceneType.ST_Hall);
+    }
+
+    void OnRoomKick(qp_server.qp_room_kick notify)
+    {
+        Log.Logic("room RoomKick {0} {1} {2}", notify.room_id, notify.type, notify.user_id);
+        if (notify.room_id != GlobalData.Ins.currentRoomId || notify.user_id != GlobalData.Ins.userId)
+        {
+            //和客户端存的房间ID不一样
+            Log.Error("RoomDissmiss, serverRoomId={0}, localServerRoomId={1}, serverUserId={2}, selfId={3}",
+                notify.room_id, GlobalData.Ins.currentRoomId, notify.user_id, GlobalData.Ins.userId);
+            return;
+        }
+        Scheduling.Ins.ChangeScene(SceneType.ST_Hall);
     }
 
     /// <summary>

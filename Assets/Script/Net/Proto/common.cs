@@ -610,6 +610,92 @@ namespace qp_server
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::ProtoBuf.ProtoContract(Name=@"qp_room_dissmiss")]
+  public partial class qp_room_dissmiss : global::ProtoBuf.IExtensible
+  {
+    public qp_room_dissmiss() {}
+    
+    private int _room_id;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"room_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int room_id
+    {
+      get { return _room_id; }
+      set { _room_id = value; }
+    }
+    private int _type;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int type
+    {
+      get { return _type; }
+      set { _type = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::ProtoBuf.ProtoContract(Name=@"qp_room_kick")]
+  public partial class qp_room_kick : global::ProtoBuf.IExtensible
+  {
+    public qp_room_kick() {}
+    
+    private int _room_id;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"room_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int room_id
+    {
+      get { return _room_id; }
+      set { _room_id = value; }
+    }
+    private int _user_id;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"user_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int user_id
+    {
+      get { return _user_id; }
+      set { _user_id = value; }
+    }
+    private int _type;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int type
+    {
+      get { return _type; }
+      set { _type = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::ProtoBuf.ProtoContract(Name=@"qp_user_online_state_change")]
+  public partial class qp_user_online_state_change : global::ProtoBuf.IExtensible
+  {
+    public qp_user_online_state_change() {}
+    
+    private int _room_id;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"room_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int room_id
+    {
+      get { return _room_id; }
+      set { _room_id = value; }
+    }
+    private int _user_id;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"user_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int user_id
+    {
+      get { return _user_id; }
+      set { _user_id = value; }
+    }
+    private bool _online;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"online", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public bool online
+    {
+      get { return _online; }
+      set { _online = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::ProtoBuf.ProtoContract(Name=@"qp_game_data")]
   public partial class qp_game_data : global::ProtoBuf.IExtensible
   {
@@ -732,6 +818,15 @@ namespace qp_server
             
       [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_EXIT_ROOM_PUSH", Value=1016)]
       CMD_QP_EXIT_ROOM_PUSH = 1016,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_ROOM_DISSMISS", Value=1017)]
+      CMD_QP_ROOM_DISSMISS = 1017,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_ROOM_KICK", Value=1018)]
+      CMD_QP_ROOM_KICK = 1018,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_USER_ONLINE_STATE_CHANGE", Value=1019)]
+      CMD_QP_USER_ONLINE_STATE_CHANGE = 1019,
             
       [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_GAME_DATA", Value=2001)]
       CMD_QP_GAME_DATA = 2001,
