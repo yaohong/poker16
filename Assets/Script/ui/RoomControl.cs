@@ -128,6 +128,9 @@ public class RoomControl : MonoBehaviourX, IScene
             case qp_server.ws_cmd.CMD_QP_ROOM_KICK:
                 OnRoomKick(CmdBase.ProtoBufDeserialize<qp_server.qp_room_kick>(packet.serialized));
                 break;
+            case qp_server.ws_cmd.CMD_QP_KICK:
+                OnKick(CmdBase.ProtoBufDeserialize<qp_server.qp_kick>(packet.serialized));
+                break;
             case qp_server.ws_cmd.CMD_QP_PING_RSP:
                 Log.Error("currentScene[ROOM], ping_rsp");
                 break;
@@ -288,6 +291,12 @@ public class RoomControl : MonoBehaviourX, IScene
         Scheduling.Ins.ChangeScene(SceneType.ST_Hall);
     }
 
+    void OnKick(qp_server.qp_kick kick)
+    {
+        //被T了弹到主界面
+        Scheduling.Ins.ChangeScene(SceneType.ST_Login);
+    }
+
     /// <summary>
     /// IScene接口的实现
     /// </summary>
@@ -318,7 +327,7 @@ public class RoomControl : MonoBehaviourX, IScene
         }
         //做清理操作
         gameObject.SetActive(false);
-
+        DestoryBlocked();
     }
 
 

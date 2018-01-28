@@ -49,6 +49,10 @@ public class JoinRoomDlgControl : MonoBehaviour {
 
     public void NumberBtnClick(int number)
     {
+        if (currentIndex == 6)
+        {
+            return;
+        }
         pushNumberArray[currentIndex++] = number;
         ShowNumber();
 

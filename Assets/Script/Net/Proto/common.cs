@@ -696,6 +696,33 @@ namespace qp_server
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::ProtoBuf.ProtoContract(Name=@"qp_kick")]
+  public partial class qp_kick : global::ProtoBuf.IExtensible
+  {
+    public qp_kick() {}
+    
+    private int? _noop;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"noop", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int noop
+    {
+      get { return _noop?? default(int); }
+      set { _noop = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    
+    public bool noopSpecified
+    {
+      get { return this._noop != null; }
+      set { if (value == (this._noop== null)) this._noop = value ? this.noop : (int?)null; }
+    }
+    private bool ShouldSerializenoop() { return noopSpecified; }
+    private void Resetnoop() { noopSpecified = false; }
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::ProtoBuf.ProtoContract(Name=@"qp_game_data")]
   public partial class qp_game_data : global::ProtoBuf.IExtensible
   {
@@ -827,6 +854,9 @@ namespace qp_server
             
       [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_USER_ONLINE_STATE_CHANGE", Value=1019)]
       CMD_QP_USER_ONLINE_STATE_CHANGE = 1019,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_KICK", Value=1020)]
+      CMD_QP_KICK = 1020,
             
       [global::ProtoBuf.ProtoEnum(Name=@"CMD_QP_GAME_DATA", Value=2001)]
       CMD_QP_GAME_DATA = 2001,

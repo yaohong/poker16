@@ -107,8 +107,6 @@ public class HallControl : MonoBehaviour, IScene
         cfg.is_random = isRandom;
         cfg.is_not_voice = isNotVoice;
         cfg.is_safe_mode = isSafeMode;
-        cfg.lock_userid_list.Add(10001);
-        cfg.lock_userid_list.Add(10002);
         req.cfg = cfg;
 
         byte[] buff = CmdBase.ProtoBufSerialize<qp_server.qp_create_room_req>(req);
@@ -184,6 +182,10 @@ public class HallControl : MonoBehaviour, IScene
             case qp_server.ws_cmd.CMD_QP_PING_RSP:
                 Log.Error("currentScene[HALL], ping_rsp");
                 break;
+            case qp_server.ws_cmd.CMD_QP_KICK:
+                Log.Error("kick");
+                OnKick(CmdBase.ProtoBufDeserialize<qp_server.qp_kick>(packet.serialized));
+                break;
             default:
                 Log.Error("currentScene[HALL], unknown cmd={0}", packet.cmd);
                 break;
@@ -235,6 +237,12 @@ public class HallControl : MonoBehaviour, IScene
                 GlobalData.Ins.SetRoomData(rsp.room_data);
             });
         }
+    }
+
+    void OnKick(qp_server.qp_kick kick)
+    {
+        //被T了弹到主界面
+        Scheduling.Ins.ChangeScene(SceneType.ST_Login);
     }
 
 

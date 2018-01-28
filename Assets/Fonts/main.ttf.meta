@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: af8ed818f2a20f74396d60fc512aa618
+timeCreated: 1517109771
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 20
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: DFYuanW7-GBK
+  fontNames:
+  - YouYuan
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

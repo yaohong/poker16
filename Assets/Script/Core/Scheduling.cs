@@ -67,6 +67,13 @@ public class Scheduling : MonoBehaviourX
         scope.Listen("Disconnect", new CALLBACK(OnDisconnect));
         scope.Listen("CompletePacket", new CALLBACK(OnCompletePacket));
 
+        GameObject rootPanels = GameObject.Find("_ROOT_PANELS");
+
+        for (int i = 0; i < rootPanels.transform.childCount; ++i)
+        {
+            GameObject child = rootPanels.transform.GetChild(i).gameObject;
+            child.SetActive(false);
+        }
         //UILib.SwitchProcedurePanel("LOGIN");
         ChangeScene(SceneType.ST_Login);
 	}
