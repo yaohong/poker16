@@ -156,6 +156,7 @@ public class HallControl : MonoBehaviour, IScene
     public void OnDisconnect()
     {
         //网络断开了重连
+        DestoryBlocked();
         if (!TcpManager.Ins.ConnectByIpPort(GlobalData.Ins.serverIp, GlobalData.Ins.serverPort))
         {
             Scheduling.Ins.ChangeScene(SceneType.ST_Login);

@@ -84,6 +84,7 @@ public class RoomControl : MonoBehaviourX, IScene
     }
     public void OnDisconnect()
     {
+        DestoryBlocked();
         if (!TcpManager.Ins.ConnectByIpPort(GlobalData.Ins.serverIp, GlobalData.Ins.serverPort))
         {
             Scheduling.Ins.ChangeScene(SceneType.ST_Login);
@@ -143,7 +144,6 @@ public class RoomControl : MonoBehaviourX, IScene
     void OnLoginRsp(qp_server.qp_login_rsp rsp)
     {
         Log.Logic("room login_rsp state={0}", rsp.state);
-        DestoryBlocked();
         if (rsp.state != 0)
         {
             Scheduling.Ins.ChangeScene(SceneType.ST_Login);
@@ -326,8 +326,8 @@ public class RoomControl : MonoBehaviourX, IScene
             seatUsers[i].Standup();
         }
         //做清理操作
-        gameObject.SetActive(false);
         DestoryBlocked();
+        gameObject.SetActive(false);
     }
 
 
