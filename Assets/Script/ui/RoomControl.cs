@@ -6,7 +6,7 @@ public class RoomControl : MonoBehaviourX, IScene
 {
     public GameObject dlgParentObj;
 
-
+    public GameObject sitdownOrStandupObj;
     public UILabel playMethodLable;         //显示玩法的lable
     public UILabel modeLable;               //显示分配模式的lable
     public UILabel roomNumberLable;         //显示房间号的lable
@@ -184,6 +184,7 @@ public class RoomControl : MonoBehaviourX, IScene
             seatUsers[roomUser.seatNumber].Sitdown(roomUser.nickname, roomUser.avatarUrl);
 
             GlobalData.Ins.currentSeatNumber = rsp.seat_num;
+            RefreshBtnPic();
         }
     }
 
@@ -193,6 +194,7 @@ public class RoomControl : MonoBehaviourX, IScene
         RoomUser roomUser = GlobalData.Ins.allRoomUsers[push.user_id];
         roomUser.seatNumber = push.seat_num;
         seatUsers[push.seat_num].Sitdown(roomUser.nickname, roomUser.avatarUrl);
+
     }
 
     void OnStandupRsp(qp_server.qp_standup_rsp rsp)
@@ -204,6 +206,8 @@ public class RoomControl : MonoBehaviourX, IScene
             seatUsers[roomUser.seatNumber].Standup();
             roomUser.seatNumber = -1;
             GlobalData.Ins.currentSeatNumber = -1;
+
+            RefreshBtnPic();
         }
     }
 
@@ -308,7 +312,7 @@ public class RoomControl : MonoBehaviourX, IScene
         {
             seatUsers[i].Standup();
         }
-
+        RefreshBtnPic();
         ShowPlayMethod(GlobalData.Ins.roomCfg.isAa, GlobalData.Ins.roomCfg.isLaiziPlaymethod, GlobalData.Ins.roomCfg.doubleDownScore);
         ShowMode(GlobalData.Ins.roomCfg.isRandom);
         ShowSeatUser();
@@ -386,6 +390,20 @@ public class RoomControl : MonoBehaviourX, IScene
                 RoomSeatUser seatUser = seatUsers[roomUser.seatNumber];
                 seatUser.Sitdown(roomUser.nickname, roomUser.avatarUrl);
             }
+        }
+    }
+
+    void RefreshBtnPic()
+    {
+        UIButton btn = sitdownOrStandupObj.GetComponent<UIButton>();
+        int seatNumber = GlobalData.Ins.currentSeatNumber;
+        if (seatNumber == -1)
+        {
+            btn.normalSprite = "坐下@2x";
+        }
+        else
+        {
+            btn.normalSprite = "站起@2x";
         }
     }
 
